@@ -718,12 +718,23 @@ function setupEventListeners() {
 async function init() {
   await loadAllData();
   setupEventListeners();
-  setMode(false);
 
   // Load cart from localStorage
   const savedCart = localStorage.getItem("cr7_cart");
   if (savedCart) cart = JSON.parse(savedCart);
   updateCartUI();
+
+  // Make sure admin panel is HIDDEN by default
+  const adminPanel = document.getElementById("adminPanel");
+  const customerMain = document.getElementById("customerMain");
+  const adminContainer = document.getElementById("adminPanelContainer");
+
+  if (adminPanel) adminPanel.classList.remove("active");
+  if (adminContainer) adminContainer.style.display = "none";
+  if (customerMain) customerMain.style.display = "block";
+
+  setMode(false);
 }
 
+// Call init only once
 init();

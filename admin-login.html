@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - CR7 Clothing</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: #0a0a0a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .login-container {
+        background: #141414;
+        padding: 40px;
+        border-radius: 24px;
+        width: 400px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      h2 {
+        color: white;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      input {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 20px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: white;
+        font-size: 16px;
+      }
+      button {
+        width: 100%;
+        padding: 14px;
+        background: #ff7a00;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #e06600;
+      }
+      .error {
+        color: #ff4444;
+        margin-top: 15px;
+        text-align: center;
+      }
+      .logo {
+        text-align: center;
+        color: #ff7a00;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo">CR7</div>
+      <h2>Admin Login</h2>
+      <input type="email" id="email" placeholder="Email" autocomplete="email" />
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      />
+      <button id="loginBtn">Login</button>
+      <div id="errorMsg" class="error"></div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBrXk_ltbvHPqbGnD_tIq8u9iNa_R3Bnlc",
+        authDomain: "cr7-clothing-b4d5f.firebaseapp.com",
+        projectId: "cr7-clothing-b4d5f",
+        storageBucket: "cr7-clothing-b4d5f.firebasestorage.app",
+        messagingSenderId: "671815729334",
+        appId: "1:671815729334:web:d329c18205262c5221a617",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", async () => {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const errorDiv = document.getElementById("errorMsg");
+
+          if (!email || !password) {
+            errorDiv.textContent = "Please enter email and password";
+            return;
+          }
+
+          try {
+            const userCredential = await signInWithEmailAndPassword(
+              auth,
+              email,
+              password,
+            );
+            // Store admin info
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminEmail", email);
+            // Redirect to main site
+            window.location.href = "/";
+          } catch (error) {
+            console.error("Login error:", error);
+            if (error.code === "auth/user-not-found") {
+              errorDiv.textContent =
+                "User not found. Create account in Firebase Console first.";
+            } else if (error.code === "auth/wrong-password") {
+              errorDiv.textContent = "Wrong password";
+            } else {
+              errorDiv.textContent = "Login failed: " + error.message;
+            }
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -1081,4 +1081,294 @@ async function init() {
   setMode(false);
 }
 
+// ============ SUBCATEGORY TOGGLE FUNCTION ============
+function setupSubcategoryToggles() {
+  // Toggle for MENS
+  const menCard = document.querySelector('.category-card[data-cat="men"]');
+  if (menCard) {
+    menCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subMenu = document.getElementById("subMen");
+      if (subMenu) {
+        document.querySelectorAll(".subcategory-container").forEach(menu => {
+          menu.style.display = "none";
+        });
+        subMenu.style.display = "flex";
+      }
+    });
+  }
+
+  // Toggle for GIRLS
+  const womenCard = document.querySelector('.category-card[data-cat="women"]');
+  if (womenCard) {
+    womenCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subMenu = document.getElementById("subWomen");
+      if (subMenu) {
+        document.querySelectorAll(".subcategory-container").forEach(menu => {
+          menu.style.display = "none";
+        });
+        subMenu.style.display = "flex";
+      }
+    });
+  }
+
+  // Toggle for ACCESSORIES
+  const accessoriesCard = document.querySelector('.category-card[data-cat="accessories"]');
+  if (accessoriesCard) {
+    accessoriesCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subMenu = document.getElementById("subAccessories");
+      if (subMenu) {
+        document.querySelectorAll(".subcategory-container").forEach(menu => {
+          menu.style.display = "none";
+        });
+        subMenu.style.display = "flex";
+      }
+    });
+  }
+
+  // ALL Category
+  const allCard = document.querySelector('.category-card[data-cat="all"]');
+  if (allCard) {
+    allCard.addEventListener("click", () => {
+      const randomProducts = [...products].sort(() => Math.random() - 0.5);
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = randomProducts.map(product => `
+        <div class="product-card">
+          <img class="product-img" src="${product.image}" alt="${product.name}">
+          <div class="product-info">
+            <div class="product-title">${product.name}</div>
+            <div class="product-price">$${product.price}</div>
+            <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock}</div>
+            <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
+          </div>
+        </div>
+      `).join("");
+      attachAddToCartEvents();
+    });
+  }
+
+  // Subcategory button click handlers
+  document.querySelectorAll(".subcat-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const category = btn.dataset.cat;
+      const type = btn.dataset.type;
+      filterByType(category, type);
+    });
+  });
+}
+
+function filterByType(category, type) {
+  let filtered = [];
+  
+  if (type === "all") {
+    filtered = products.filter(p => p.category === category);
+  } else {
+    filtered = products.filter(p => p.category === category && p.type === type);
+  }
+  
+  const grid = document.getElementById("productGrid");
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style='text-align:center; padding:40px;'>No products found</div>`;
+    return;
+  }
+  
+  grid.innerHTML = filtered.map(product => `
+    <div class="product-card">
+      <img class="product-img" src="${product.image}" alt="${product.name}">
+      <div class="product-info">
+        <div class="product-title">${product.name}</div>
+        <div class="product-price">$${product.price}</div>
+        <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock}</div>
+        <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
+      </div>
+    </div>
+  `).join("");
+  
+  attachAddToCartEvents();
+}
+
+function attachAddToCartEvents() {
+  document.querySelectorAll(".add-to-cart").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      addToCart(btn.getAttribute("data-id"));
+    });
+  });
+}
+
+// Close submenus when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".category-main")) {
+    document.querySelectorAll(".subcategory-container").forEach(menu => {
+      menu.style.display = "none";
+    });
+  });
+}
+
+// ============ SUBCATEGORY TOGGLE FUNCTION ============
+function setupSubcategoryToggles() {
+  // Hide all subcategory rows function
+  function hideAllSubRows() {
+    const subMen = document.getElementById("subMen");
+    const subWomen = document.getElementById("subWomen");
+    const subAccessories = document.getElementById("subAccessories");
+    
+    if (subMen) subMen.style.display = "none";
+    if (subWomen) subWomen.style.display = "none";
+    if (subAccessories) subAccessories.style.display = "none";
+  }
+
+  // Get all category cards
+  const menCard = document.querySelector('.category-card[data-cat="men"]');
+  const womenCard = document.querySelector('.category-card[data-cat="women"]');
+  const accessoriesCard = document.querySelector('.category-card[data-cat="accessories"]');
+  const allCard = document.querySelector('.category-card[data-cat="all"]');
+
+  // MENS Category Click
+  if (menCard) {
+    menCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subRow = document.getElementById("subMen");
+      if (subRow) {
+        // Close other subcategory rows first
+        hideAllSubRows();
+        // Toggle this one
+        if (subRow.style.display === "none" || subRow.style.display === "") {
+          subRow.style.display = "flex";
+        } else {
+          subRow.style.display = "none";
+        }
+      } else {
+        console.log("subMen element not found!");
+      }
+    });
+  }
+
+  // GIRLS Category Click
+  if (womenCard) {
+    womenCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subRow = document.getElementById("subWomen");
+      if (subRow) {
+        hideAllSubRows();
+        if (subRow.style.display === "none" || subRow.style.display === "") {
+          subRow.style.display = "flex";
+        } else {
+          subRow.style.display = "none";
+        }
+      }
+    });
+  }
+
+  // ACCESSORIES Category Click
+  if (accessoriesCard) {
+    accessoriesCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const subRow = document.getElementById("subAccessories");
+      if (subRow) {
+        hideAllSubRows();
+        if (subRow.style.display === "none" || subRow.style.display === "") {
+          subRow.style.display = "flex";
+        } else {
+          subRow.style.display = "none";
+        }
+      }
+    });
+  }
+
+  // ALL Category Click - Random products, no subcategories
+  if (allCard) {
+    allCard.addEventListener("click", () => {
+      hideAllSubRows();
+      const randomProducts = [...products].sort(() => Math.random() - 0.5);
+      const grid = document.getElementById("productGrid");
+      if (grid) {
+        grid.innerHTML = randomProducts.map(product => `
+          <div class="product-card">
+            <img class="product-img" src="${product.image}" alt="${product.name}">
+            <div class="product-info">
+              <div class="product-title">${product.name}</div>
+              <div class="product-price">$${product.price}</div>
+              <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock}</div>
+              <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
+            </div>
+          </div>
+        `).join("");
+        attachAddToCartEvents();
+      }
+    });
+  }
+
+  // Subcategory button click handlers
+  document.querySelectorAll(".subcat-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const category = btn.getAttribute("data-cat");
+      const type = btn.getAttribute("data-type");
+      filterByType(category, type);
+      // Hide subcategory row after selection
+      hideAllSubRows();
+    });
+  });
+}
+
+// Filter products by type
+function filterByType(category, type) {
+  let filtered = [];
+  
+  if (type === "all") {
+    filtered = products.filter(p => p.category === category);
+  } else {
+    filtered = products.filter(p => p.category === category && p.type === type);
+  }
+  
+  const grid = document.getElementById("productGrid");
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style='text-align:center; padding:40px;'>No products found in this category</div>`;
+    return;
+  }
+  
+  grid.innerHTML = filtered.map(product => `
+    <div class="product-card">
+      <img class="product-img" src="${product.image}" alt="${product.name}">
+      <div class="product-info">
+        <div class="product-title">${product.name}</div>
+        <div class="product-price">$${product.price}</div>
+        <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock}</div>
+        <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
+      </div>
+    </div>
+  `).join("");
+  
+  attachAddToCartEvents();
+}
+
+function attachAddToCartEvents() {
+  document.querySelectorAll(".add-to-cart").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      addToCart(btn.getAttribute("data-id"));
+    });
+  });
+}
+
+// Click outside to hide subcategory rows
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".category-card") && !e.target.closest(".subcat-btn")) {
+    const subMen = document.getElementById("subMen");
+    const subWomen = document.getElementById("subWomen");
+    const subAccessories = document.getElementById("subAccessories");
+    
+    if (subMen) subMen.style.display = "none";
+    if (subWomen) subWomen.style.display = "none";
+    if (subAccessories) subAccessories.style.display = "none";
+  }
+});
+  // ✅ ADD THIS LINE HERE - INSIDE init() function
+  setupSubcategoryToggles();
+
 init();
+

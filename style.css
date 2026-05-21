@@ -158,16 +158,21 @@ h2 {
 }
 
 /* Admin Panel */
-.admin-panel {
-  background: white;
-  border-radius: 28px;
-  padding: 28px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+/* Hide admin panel by default */
+#adminPanel {
+  display: none !important;
+}
+
+#adminPanel.active {
+  display: block !important;
+}
+
+/* Hide admin panel container */
+#adminPanelContainer {
   display: none;
 }
 
-.admin-panel.active {
+#adminPanelContainer.show {
   display: block;
 }
 
@@ -394,6 +399,16 @@ button:hover {
   background: #ff7a00;
   border: none;
   color: white;
+  padding: 0.5rem 0;
+  width: 100%;
+  border-radius: 40px;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  transition: 0.2s;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
 
 .add-to-cart:hover {
   background: #e06600;

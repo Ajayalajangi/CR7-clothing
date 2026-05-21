@@ -645,3 +645,120 @@ button:hover {
     font-size: 0.8rem;
   }
 }
+
+/* Order Modal Styles */
+.order-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+.order-modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 24px;
+  padding: 30px;
+  position: relative;
+  animation: slideIn 0.3s ease;
+}
+
+.order-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+}
+
+.order-modal-close:hover {
+  color: #ff7a00;
+}
+
+.order-modal-content h3 {
+  margin-bottom: 20px;
+  color: #1e1e2a;
+}
+
+.order-modal-content input,
+.order-modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.order-modal-content input:focus,
+.order-modal-content textarea:focus {
+  outline: none;
+  border-color: #ff7a00;
+}
+
+#placeOrderBtn {
+  width: 100%;
+  background: #ff7a00;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#placeOrderBtn:hover {
+  background: #e06600;
+}
+
+/* Success Animation */
+.order-success {
+  text-align: center;
+  padding: 20px;
+}
+
+.success-animation {
+  width: 80px;
+  height: 80px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  animation: scaleUp 0.5s ease;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

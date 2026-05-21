@@ -342,9 +342,24 @@ function addToCart(productId) {
 }
 
 // Checkout
-async function checkout() {
+// Show order modal when cart is checked out
+function showOrderModal() {
   if (cart.length === 0) {
     alert("Cart is empty!");
+    return;
+  }
+  document.getElementById("orderModal").style.display = "flex";
+}
+
+// Place order with customer details
+async function placeOrderWithDetails() {
+  const name = document.getElementById("customerName").value.trim();
+  const email = document.getElementById("customerEmail").value.trim();
+  const phone = document.getElementById("customerPhone").value.trim();
+  const address = document.getElementById("customerAddress").value.trim();
+
+  if (!name || !email || !phone || !address) {
+    alert("Please fill all required fields");
     return;
   }
 
@@ -353,12 +368,14 @@ async function checkout() {
     total += item.price * item.quantity;
     const product = products.find((p) => p.id === item.id);
     if (product) {
-      const newStock = product.stock - item.quantity;
-      await updateProductInFirebase(product.id, { stock: newStock });
+      product.stock -= item.quantity;
+      await updateProductInFirebase(product.id, { stock: product.stock });
     }
   }
 
   const order = {
+    customer: { name, email, phone, address },
+    notes: document.getElementById("orderNotes").value,
     items: cart.map((i) => ({
       name: i.name,
       quantity: i.quantity,
@@ -370,11 +387,40 @@ async function checkout() {
   };
 
   await addOrderToFirebase(order);
+
+  // Show success animation
+  document.getElementById("orderForm").style.display = "none";
+  document.getElementById("orderSuccess").style.display = "block";
+
   cart = [];
   updateCartUI();
-  await loadAllData();
-  alert("✅ Order placed successfully! Admin will process your order.");
+  saveAll();
+
+  // Close modal after 2 seconds
+  setTimeout(() => {
+    document.getElementById("orderModal").style.display = "none";
+    // Reset form for next time
+    document.getElementById("orderForm").reset();
+    document.getElementById("orderForm").style.display = "block";
+    document.getElementById("orderSuccess").style.display = "none";
+  }, 2000);
 }
+
+// Update cart button click
+document
+  .getElementById("cartIconBtn")
+  .addEventListener("click", showOrderModal);
+
+// Close modal
+document.querySelector(".order-modal-close").addEventListener("click", () => {
+  document.getElementById("orderModal").style.display = "none";
+});
+
+// Submit order
+document.getElementById("orderForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  placeOrderWithDetails();
+});
 
 // ============ ADMIN FUNCTIONS ============
 

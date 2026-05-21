@@ -240,11 +240,13 @@ button:hover {
 }
 
 /* Hero Section */
+/* Hero Section - Force visibility */
 .hero {
   background: linear-gradient(107deg, #f7ede8 0%, #f3e7df 100%);
   border-radius: 2rem;
   margin: 2rem 0 3rem;
   overflow: hidden;
+  padding: 0;
 }
 
 .hero-grid {
@@ -252,24 +254,35 @@ button:hover {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   align-items: center;
-  padding: 2rem 2rem 2rem 3rem;
+  padding: 2rem;
 }
 
 .hero-title {
-  font-size: 3.2rem;
+  font-size: 2.8rem;
   line-height: 1.2;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
+  color: #1e1e2a;
+  font-weight: 700;
 }
 
 .hero-highlight {
   color: #ff7a00;
+  display: block;
+  margin-top: 5px;
 }
 
 .hero-text {
   color: #4a4a5a;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 1rem;
-  max-width: 90%;
+  line-height: 1.5;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 1.5rem;
 }
 
 .btn {

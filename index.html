@@ -34,7 +34,7 @@
             <i class="fas fa-search"></i>
           </button>
           <button class="icon-btn" id="cartIconBtn" aria-label="cart">
-            🛒 <span id="cartCountBadge" style="font-size: 0.7rem">0</span>
+            🛒 <span id="cartCountBadge">0</span>
           </button>
           <div class="profile-wrapper" id="profileWrapper">
             <button class="icon-btn" id="profileIconBtn" aria-label="profile">
@@ -53,6 +53,121 @@
       </div>
     </header>
 
+    <!-- Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+      <div class="cart-modal-content">
+        <div class="cart-modal-header">
+          <h2>🛒 Your Shopping Cart</h2>
+          <span class="cart-modal-close">&times;</span>
+        </div>
+        <div id="cartItemsList" class="cart-items-list">
+          <div style="text-align: center; padding: 40px">
+            Your cart is empty
+          </div>
+        </div>
+        <div class="cart-summary">
+          <div class="cart-total">
+            <span>Subtotal:</span><span id="cartSubtotal">$0</span>
+          </div>
+          <div class="cart-total">
+            <span>Shipping:</span><span id="cartShipping">$0</span>
+          </div>
+          <div class="cart-grand-total">
+            <span>Total:</span><span id="cartGrandTotal">$0</span>
+          </div>
+        </div>
+        <button class="continue-shopping-btn" id="continueShoppingBtn">
+          ← Continue Shopping
+        </button>
+        <button class="proceed-btn" id="proceedToDeliveryBtn">
+          Proceed to Delivery →
+        </button>
+
+        <div
+          id="deliverySection"
+          class="delivery-section"
+          style="display: none"
+        >
+          <h3>📦 Delivery Address</h3>
+          <input
+            type="text"
+            id="deliveryName"
+            placeholder="Full Name"
+            required
+          />
+          <input
+            type="email"
+            id="deliveryEmail"
+            placeholder="Email Address"
+            required
+          />
+          <input
+            type="tel"
+            id="deliveryPhone"
+            placeholder="Phone Number"
+            required
+          />
+          <textarea
+            id="deliveryAddress"
+            placeholder="Complete Address"
+            rows="3"
+            required
+          ></textarea>
+          <textarea
+            id="deliveryNotes"
+            placeholder="Order Notes"
+            rows="2"
+          ></textarea>
+          <button class="back-to-cart-btn" id="backToCartBtn">
+            ← Back to Cart
+          </button>
+          <button class="proceed-payment-btn" id="proceedToPaymentBtn">
+            Proceed to Payment →
+          </button>
+        </div>
+
+        <div id="paymentSection" class="payment-section" style="display: none">
+          <h3>💳 Select Payment Method</h3>
+          <div class="payment-options">
+            <label class="payment-option"
+              ><input type="radio" name="paymentMethod" value="cod" checked />
+              💵 Cash on Delivery (COD)</label
+            >
+            <label class="payment-option"
+              ><input type="radio" name="paymentMethod" value="online" /> 🏦
+              Online Payment (Coming Soon)</label
+            >
+          </div>
+          <div
+            id="onlinePaymentMsg"
+            class="online-payment-msg"
+            style="display: none"
+          >
+            ⚡ Online payment coming soon! Please select COD.
+          </div>
+          <button class="back-to-delivery-btn" id="backToDeliveryBtn">
+            ← Back to Delivery
+          </button>
+          <button class="place-order-btn" id="placeOrderFinalBtn">
+            Place Order ✅
+          </button>
+        </div>
+
+        <div
+          id="orderSuccessAnim"
+          class="order-success-anim"
+          style="display: none"
+        >
+          <div class="success-checkmark">✓</div>
+          <h3>🎉 Order Placed Successfully!</h3>
+          <p>Thank you for shopping with CR7!</p>
+          <button class="close-success-btn" id="closeSuccessBtn">
+            Continue Shopping →
+          </button>
+        </div>
+      </div>
+    </div>
+
     <main id="customerMain">
       <div class="container">
         <div class="hero">
@@ -65,22 +180,18 @@
               <p class="hero-text">
                 Minimal design. Maximum comfort. Everyday confidence.
               </p>
-              <div>
-                <a href="#" class="btn" id="shopNowBtn">Shop Now →</a>
-                <a href="#" class="btn btn-outline">Explore dude</a>
-              </div>
+              <div><a href="#" class="btn" id="shopNowBtn">Shop Now →</a></div>
             </div>
             <div>
               <img
                 class="hero-image"
                 src="https://placehold.co/600x500/1a1a1a/ff7a00?text=CR7+Style"
-                alt="Hero clothing style"
+                alt="Hero"
               />
             </div>
           </div>
         </div>
 
-        <!-- Categories Section - REPLACE THIS BLOCK -->
         <div class="categories">
           <h2>Shop by category</h2>
           <div class="section-subhead">Curated for every vibe</div>
@@ -88,44 +199,130 @@
             <div class="category-card" data-cat="men">
               <div class="category-icon">👨</div>
               <h3>MENS</h3>
-              <p style="font-size: 0.8rem">
-                Shirts, Tees, Jeans, Trousers, Joggers, Inners, Shoes, Slides
-              </p>
+              <p>Shirts, Tees, Jeans & more</p>
             </div>
             <div class="category-card" data-cat="women">
               <div class="category-icon">👩</div>
               <h3>GIRLS</h3>
-              <p style="font-size: 0.8rem">
-                Shirts, Tees, Jeans, Trousers, Joggers, Shoes, Slides
-              </p>
+              <p>Trendy & comfortable</p>
             </div>
             <div class="category-card" data-cat="accessories">
               <div class="category-icon">👜</div>
               <h3>ACCESSORIES</h3>
-              <p style="font-size: 0.8rem">
-                Handbags, Watches, Rings, Caps, Eyeglasses, Wallets
-              </p>
+              <p>Complete your look</p>
             </div>
             <div class="category-card" data-cat="all">
               <div class="category-icon">🎲</div>
               <h3>ALL</h3>
-              <p style="font-size: 0.8rem">Random Mix - Every Refresh</p>
+              <p>Random Mix</p>
             </div>
+          </div>
+
+          <div id="subMen" class="subcategory-row" style="display: none">
+            <button class="subcat-btn" data-cat="men" data-type="all">
+              All Men
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="shirt">
+              👕 Shirts
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="tee">
+              👕 Tees
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="jeans">
+              👖 Jeans
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="trousers">
+              👖 Trousers
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="joggers">
+              🏃 Joggers
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="inners">
+              🩳 Inners
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="shoes">
+              👟 Shoes
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="oversized">
+              📏 Oversized
+            </button>
+            <button class="subcat-btn" data-cat="men" data-type="slides">
+              🩴 Slides
+            </button>
+          </div>
+
+          <div id="subWomen" class="subcategory-row" style="display: none">
+            <button class="subcat-btn" data-cat="women" data-type="all">
+              All Women
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="shirt">
+              👚 Shirts
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="tee">
+              👕 Tees
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="jeans">
+              👖 Jeans
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="trousers">
+              👖 Trousers
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="joggers">
+              🏃 Joggers
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="shoes">
+              👟 Shoes
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="oversized">
+              📏 Oversized
+            </button>
+            <button class="subcat-btn" data-cat="women" data-type="slides">
+              🩴 Slides
+            </button>
+          </div>
+
+          <div
+            id="subAccessories"
+            class="subcategory-row"
+            style="display: none"
+          >
+            <button class="subcat-btn" data-cat="accessories" data-type="all">
+              All Accessories
+            </button>
+            <button
+              class="subcat-btn"
+              data-cat="accessories"
+              data-type="handbag"
+            >
+              👜 Handbags
+            </button>
+            <button class="subcat-btn" data-cat="accessories" data-type="watch">
+              ⌚ Watches
+            </button>
+            <button class="subcat-btn" data-cat="accessories" data-type="ring">
+              💍 Rings
+            </button>
+            <button class="subcat-btn" data-cat="accessories" data-type="cap">
+              🧢 Caps
+            </button>
+            <button
+              class="subcat-btn"
+              data-cat="accessories"
+              data-type="eyeglasses"
+            >
+              👓 Eyeglasses
+            </button>
+            <button
+              class="subcat-btn"
+              data-cat="accessories"
+              data-type="wallet"
+            >
+              👛 Wallets
+            </button>
           </div>
         </div>
 
-        <div
-          id="announcementBanner"
-          style="
-            background: linear-gradient(135deg, #ff7a00, #e06600);
-            padding: 15px;
-            border-radius: 20px;
-            margin: 20px 0;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-          "
-        ></div>
+        <div id="announcementBanner" class="announcement-banner"></div>
 
         <div class="products">
           <h2>Picked Just for You</h2>
@@ -137,22 +334,12 @@
 
         <div class="about">
           <h2>Buy Better. Wear Longer.</h2>
-          <p>
-            Clean fits, premium feel, and comfort that lasts. We create everyday
-            clothing that looks better, feels better, and stays in your rotation
-            longer.
-          </p>
-          <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #ff7a00">
-            Premium essentials engineered for comfort, confidence, and everyday
-            style — made to stay with you season after season.
-          </p>
+          <p>Clean fits, premium feel, and comfort that lasts.</p>
         </div>
 
         <div class="newsletter">
           <h3>Step Into Better Style.</h3>
-          <p style="color: #5f5f72">
-            Get 15% off your first order & early access to new collections.
-          </p>
+          <p>Get 15% off your first order</p>
           <div class="newsletter-form">
             <input
               type="email"
@@ -161,14 +348,10 @@
             />
             <button class="btn" id="newsletterBtn">Subscribe →</button>
           </div>
-          <p style="font-size: 0.7rem; margin-top: 1rem">
-            No spam, only style inspiration.
-          </p>
         </div>
       </div>
     </main>
 
-    <!-- ADMIN PANEL (hidden by default) -->
     <div class="container" id="adminPanelContainer" style="display: none">
       <div class="admin-panel" id="adminPanel">
         <h2 style="color: #ff7a00">🔐 Admin Control Center</h2>
@@ -188,9 +371,7 @@
               <tbody id="adminStockBody"></tbody>
             </table>
           </div>
-          <div
-            style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap"
-          >
+          <div style="display: flex; gap: 10px; margin-top: 20px">
             <input type="text" id="newProdName" placeholder="Product Name" />
             <input
               type="number"
@@ -213,79 +394,25 @@
           </div>
         </div>
         <div class="admin-section">
-          <h3>📢 New Drops / Announcements</h3>
-          <input
-            type="text"
-            id="announcementText"
-            placeholder="e.g., New Summer Collection Arriving Soon!"
-            style="width: 70%"
-          />
-          <button id="postAnnouncementBtn">Post Announcement</button>
-          <div id="announcementsList" style="margin-top: 15px"></div>
+          <h3>📢 Announcements</h3>
+          <input type="text" id="announcementText" style="width: 70%" /><button
+            id="postAnnouncementBtn"
+          >
+            Post
+          </button>
+          <div id="announcementsList"></div>
         </div>
         <div class="admin-section">
-          <h3>💬 Reply to Customer Feedback</h3>
-          <div
-            id="adminFeedbackList"
-            style="max-height: 250px; overflow-y: auto"
-          ></div>
+          <h3>💬 Feedback</h3>
+          <div id="adminFeedbackList"></div>
         </div>
         <div class="admin-section">
-          <h3>📦 Customer Orders</h3>
-          <div
-            id="ordersList"
-            style="max-height: 200px; overflow-y: auto"
-          ></div>
+          <h3>📦 Orders</h3>
+          <div id="ordersList"></div>
         </div>
       </div>
     </div>
 
-    <!-- Order Details Modal (ONLY ONCE) -->
-    <div id="orderModal" class="order-modal">
-      <div class="order-modal-content">
-        <span class="order-modal-close">&times;</span>
-        <h3>📋 Complete Your Order</h3>
-        <form id="orderForm">
-          <input
-            type="text"
-            id="customerName"
-            placeholder="Full Name"
-            required
-          />
-          <input
-            type="email"
-            id="customerEmail"
-            placeholder="Email Address"
-            required
-          />
-          <input
-            type="tel"
-            id="customerPhone"
-            placeholder="Phone Number"
-            required
-          />
-          <textarea
-            id="customerAddress"
-            placeholder="Complete Address"
-            rows="3"
-            required
-          ></textarea>
-          <textarea
-            id="orderNotes"
-            placeholder="Special Instructions (Optional)"
-            rows="2"
-          ></textarea>
-          <button type="submit" id="placeOrderBtn">Place Order ✅</button>
-        </form>
-        <div id="orderSuccess" class="order-success" style="display: none">
-          <div class="success-animation">✓</div>
-          <p>🎉 Order Placed Successfully!</p>
-          <p>We'll contact you shortly.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Community Modal -->
     <div id="communityModal" class="community-modal">
       <div class="community-panel">
         <h3>
@@ -296,55 +423,32 @@
         </h3>
         <div id="chatMessagesList" class="chat-messages"></div>
         <div class="chat-input-group">
-          <input
-            type="text"
-            id="chatInput"
-            placeholder="Discuss clothing, stock, prices..."
-          />
-          <button class="send-chat-btn" id="sendChatMsgBtn">Send</button>
+          <input type="text" id="chatInput" placeholder="Discuss..." /><button
+            class="send-chat-btn"
+            id="sendChatMsgBtn"
+          >
+            Send
+          </button>
         </div>
         <div class="feedback-section">
           <h4>✨ Share your feedback</h4>
-          <textarea
-            id="feedbackTextArea"
-            rows="2"
-            placeholder="Tell us what clothes you need..."
-          ></textarea>
-          <button
-            class="btn"
-            id="submitFeedbackModalBtn"
-            style="padding: 0.5rem 1rem"
-          >
-            Submit Feedback
-          </button>
+          <textarea id="feedbackTextArea" rows="2"></textarea
+          ><button class="btn" id="submitFeedbackModalBtn">Submit</button>
         </div>
-        <div
-          id="feedbackPreview"
-          style="margin-top: 12px; font-size: 0.8rem; color: #5a5a6e"
-        ></div>
       </div>
     </div>
 
-    <!-- Search Modal -->
     <div id="searchModal" class="search-modal">
       <div class="search-modal-content">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+        <div style="display: flex; gap: 10px">
           <input
             type="text"
             id="searchInput"
-            placeholder="Search for products... (e.g., shirt, tshirt, men shirt)"
-            autofocus
-          />
-          <button id="closeSearchBtn">✕</button>
+            placeholder="Search products..."
+          /><button id="closeSearchBtn">✕</button>
         </div>
         <div id="searchResults" class="search-results"></div>
-        <div
-          id="noResults"
-          style="display: none; text-align: center; padding: 40px; color: #888"
-        >
-          🔍 No products found. Try searching for: shirt, tshirt, jeans, jacket,
-          dress
-        </div>
+        <div id="noResults" style="display: none">No products found</div>
       </div>
     </div>
 
@@ -358,38 +462,26 @@
             margin-bottom: 25px;
           "
         >
-          <a
-            href="mailto:cr7clothing@gmail.com"
-            style="color: #5a5a6e; text-decoration: none; font-size: 28px"
-          >
-            <i class="fas fa-envelope"></i>
-          </a>
-          <a
-            href="https://instagram.com/cr7clothing"
-            target="_blank"
-            style="color: #5a5a6e; text-decoration: none; font-size: 28px"
-          >
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a
-            href="https://linkedin.com/in/cr7clothing"
-            target="_blank"
-            style="color: #5a5a6e; text-decoration: none; font-size: 28px"
-          >
-            <i class="fab fa-linkedin-in"></i>
-          </a>
+          <a href="mailto:cr7clothing@gmail.com"
+            ><i class="fas fa-envelope"></i
+          ></a>
+          <a href="https://instagram.com/cr7clothing" target="_blank"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://linkedin.com/in/cr7clothing" target="_blank"
+            ><i class="fab fa-linkedin-in"></i
+          ></a>
         </div>
-        <p style="font-size: 0.8rem; color: #5a5a6e">
+        <p>
           Website Developed by
           <a
-            href="https://www.instagram.com/_.ajay.cruzz/?hl=en"
+            href="https://www.instagram.com/_.ajay.cruzz/"
             target="_blank"
-            style="color: #ff7a00; text-decoration: none; font-weight: bold"
+            style="color: #ff7a00"
+            >AjayCruzz</a
           >
-            AjayCruzz
-          </a>
         </p>
-        <p style="font-size: 0.7rem; color: #aaa">© 2025 All rights reserved</p>
+        <p>© 2025 All rights reserved</p>
       </div>
     </footer>
 

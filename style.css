@@ -557,28 +557,46 @@ button:hover {
 
 /* Footer */
 .footer {
-  border-top: 1px solid #ece2db;
-  padding: 3rem 0 2rem;
-  margin-top: 2rem;
   background: #fefaf5;
+  padding: 2rem 0;
+  border-top: 1px solid #ece2db;
+  text-align: center;
 }
 
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.footer-contact-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.footer-col p {
+.footer-contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: #5a5a6e;
-  margin: 0.5rem 0;
   font-size: 0.85rem;
 }
 
-.footer-col strong {
-  color: #1e1e2a;
+.footer-contact-item a {
+  color: #5a5a6e;
+  text-decoration: none;
+  transition: 0.2s;
 }
 
+.footer-contact-item a:hover {
+  color: #ff7a00;
+}
+
+.footer-dev p {
+  color: #5a5a6e;
+  font-size: 0.75rem;
+}
+
+.footer-dev strong {
+  color: #ff7a00;
+}
 /* Toast Notification */
 .toast-msg {
   position: fixed;

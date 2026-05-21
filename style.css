@@ -877,3 +877,7 @@ button:hover {
   color: #000000 !important;
   fill: #000000 !important;
 }
+
+#announcementBanner {
+  display: none !important;
+}

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Login - CR7 Clothing</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .login-wrapper {
+        display: flex;
+        max-width: 850px;
+        width: 100%;
+        background: #141414;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* Left Side - Brand Section */
+      .brand-section {
+        flex: 1;
+        background: linear-gradient(135deg, #ff7a00, #e06600);
+        padding: 35px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .brand-logo {
+        font-size: 32px;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -1px;
+        margin-bottom: 20px;
+      }
+
+      .brand-tagline h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      .brand-tagline p {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+      }
+
+      .brand-features {
+        list-style: none;
+        margin-top: 25px;
+      }
+
+      .brand-features li {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .brand-features li i {
+        font-size: 14px;
+      }
+
+      /* Right Side - Form Section */
+      .form-section {
+        flex: 1;
+        padding: 35px 30px;
+      }
+
+      .form-header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .form-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 5px;
+      }
+
+      .form-header p {
+        color: #888;
+        font-size: 12px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        color: #aaa;
+        font-size: 11px;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #ff7a00;
+        box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.2);
+      }
+
+      .forgot-link {
+        text-align: right;
+        margin-bottom: 20px;
+      }
+
+      .forgot-link a {
+        color: #ff7a00;
+        font-size: 11px;
+        text-decoration: none;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 11px;
+        background: #ff7a00;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .login-btn:hover {
+        background: #e06600;
+        transform: translateY(-1px);
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 18px 0;
+        color: #555;
+        font-size: 11px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #333;
+      }
+
+      .divider::before {
+        margin-right: 12px;
+      }
+
+      .divider::after {
+        margin-left: 12px;
+      }
+
+      .signup-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      .signup-link a {
+        color: #ff7a00;
+        text-decoration: none;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 12px;
+      }
+
+      .back-link a {
+        color: #888;
+        text-decoration: none;
+        font-size: 12px;
+      }
+
+      .error-msg {
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid #ff4444;
+        color: #ff4444;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-bottom: 15px;
+        text-align: center;
+        display: none;
+      }
+
+      @media (max-width: 700px) {
+        .login-wrapper {
+          flex-direction: column;
+          max-width: 380px;
+        }
+
+        .brand-section {
+          padding: 25px;
+          text-align: center;
+        }
+
+        .brand-features {
+          display: none;
+        }
+
+        .form-section {
+          padding: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <div class="brand-section">
+        <div class="brand-logo">CR7</div>
+        <div class="brand-tagline">
+          <h2>Welcome Back!</h2>
+          <p>Login to continue shopping</p>
+        </div>
+        <ul class="brand-features">
+          <li><i class="fas fa-truck"></i> Free Shipping $50+</li>
+          <li><i class="fas fa-undo-alt"></i> Easy Returns</li>
+          <li><i class="fas fa-headset"></i> 24/7 Support</li>
+        </ul>
+      </div>
+
+      <div class="form-section">
+        <div class="form-header">
+          <h1>Sign In</h1>
+          <p>Enter your credentials</p>
+        </div>
+
+        <div id="errorMsg" class="error-msg"></div>
+
+        <div class="input-group">
+          <label>Email or Phone</label>
+          <input
+            type="text"
+            id="identifier"
+            placeholder="Enter email or phone"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" />
+        </div>
+
+        <div class="forgot-link">
+          <a href="forgot-password.html">Forgot Password?</a>
+        </div>
+
+        <button id="loginBtn" class="login-btn">Sign In</button>
+
+        <div class="divider">OR</div>
+
+        <div class="signup-link">
+          New customer? <a href="customer-signup.html">Create Account</a>
+        </div>
+
+        <div class="back-link">
+          <a href="/">← Back to Store</a>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { customerLogin, onAuthStateChanged, isAdmin } from "./auth.js";
+
+      const loginBtn = document.getElementById("loginBtn");
+      const identifier = document.getElementById("identifier");
+      const password = document.getElementById("password");
+      const errorMsg = document.getElementById("errorMsg");
+
+      loginBtn.addEventListener("click", async () => {
+        const id = identifier.value.trim();
+        const pass = password.value;
+
+        if (!id || !pass) {
+          errorMsg.textContent = "Please enter email/phone and password";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        errorMsg.style.display = "none";
+        loginBtn.textContent = "Signing in...";
+        loginBtn.disabled = true;
+
+        const result = await customerLogin(id, pass);
+
+        if (result.success) {
+          localStorage.setItem("customerLoggedIn", "true");
+          localStorage.setItem("customerId", result.userId);
+          localStorage.setItem("customerEmail", id);
+
+          const returnUrl = localStorage.getItem("returnUrl");
+          if (returnUrl) {
+            localStorage.removeItem("returnUrl");
+            window.location.href = returnUrl;
+          } else if (result.isAdmin) {
+            window.location.href = "admin-dashboard.html"; // Redirect to admin dashboard
+          } else {
+            window.location.href = "customer-dashboard.html";
+          }
+        } else {
+          errorMsg.textContent = result.message;
+          errorMsg.style.display = "block";
+          loginBtn.textContent = "Sign In";
+          loginBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

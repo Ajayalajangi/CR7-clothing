@@ -239,47 +239,99 @@ function showPayment() {
   document.getElementById("deliverySection").style.display = "none";
   document.getElementById("paymentSection").style.display = "block";
 }
-
 async function placeOrder() {
+  console.log("🔥 placeOrder STARTED");
+
   const name = document.getElementById("deliveryName")?.value.trim();
   const email = document.getElementById("deliveryEmail")?.value.trim();
   const phone = document.getElementById("deliveryPhone")?.value.trim();
   const addr = document.getElementById("deliveryAddress")?.value.trim();
+  const notes = document.getElementById("deliveryNotes")?.value.trim();
+
   if (!name || !email || !phone || !addr) {
-    alert("Fill all details");
+    alert("Please fill all delivery details");
     return;
   }
+
+  console.log("✅ Delivery details validated");
+
+  const orderBtn = document.getElementById("placeOrderFinalBtn");
+  const originalText = orderBtn.textContent;
+  orderBtn.textContent = "⏳ Placing Order...";
+  orderBtn.disabled = true;
+
+  // Calculate total and update stock
   let total = 0;
+  console.log("📦 Cart items:", cart.length);
+
   for (const item of cart) {
     total += item.price * item.quantity;
     const prod = products.find((p) => p.id === item.id);
     if (prod) {
       prod.stock -= item.quantity;
-      await updateDoc(doc(db, "products", prod.id), { stock: prod.stock });
+      try {
+        await updateDoc(doc(db, "products", prod.id), { stock: prod.stock });
+        console.log(`✅ Stock updated for ${prod.name}`);
+      } catch (err) {
+        console.error("❌ Stock update error:", err);
+      }
     }
   }
-  await addDoc(collection(db, "orders"), {
-    customer: { name, email, phone, address: addr },
-    notes: document.getElementById("deliveryNotes")?.value || "",
+
+  console.log("💰 Total calculated:", total);
+
+  const orderData = {
+    orderId: "ORD" + Date.now(),
+    customer: { name, email, phone, address: addr, notes: notes || "" },
     items: cart.map((i) => ({
+      id: i.id,
       name: i.name,
       quantity: i.quantity,
       price: i.price,
     })),
-    total,
+    total: total,
     date: new Date().toLocaleString(),
-    status: "Pending",
+    timestamp: new Date(),
+    status: "pending",
     paymentMethod: "COD",
-  });
-  cart = [];
-  updateCartUI();
-  localStorage.setItem("cr7_cart", JSON.stringify(cart));
-  document.getElementById("paymentSection").style.display = "none";
-  document.getElementById("orderSuccessAnim").style.display = "block";
-  setTimeout(() => {
-    document.getElementById("cartModal").style.display = "none";
-    location.reload();
-  }, 2500);
+  };
+
+  console.log("📝 Order data prepared:", orderData);
+
+  try {
+    console.log("💾 Saving to Firebase...");
+    const docRef = await addDoc(collection(db, "orders"), orderData);
+    console.log("✅ Order saved! Document ID:", docRef.id);
+
+    cart = [];
+    updateCartUI();
+    localStorage.setItem("cr7_cart", JSON.stringify(cart));
+    console.log("🗑️ Cart cleared");
+
+    document.getElementById("paymentSection").style.display = "none";
+    document.getElementById("orderSuccessAnim").style.display = "block";
+    console.log("✅ Success animation shown");
+
+    orderBtn.textContent = originalText;
+    orderBtn.disabled = false;
+
+    setTimeout(() => {
+      document.getElementById("cartModal").style.display = "none";
+      document.getElementById("orderSuccessAnim").style.display = "none";
+      showCartOnly();
+      document.getElementById("deliveryName").value = "";
+      document.getElementById("deliveryEmail").value = "";
+      document.getElementById("deliveryPhone").value = "";
+      document.getElementById("deliveryAddress").value = "";
+      document.getElementById("deliveryNotes").value = "";
+      console.log("🔄 Modal closed and form reset");
+    }, 3000);
+  } catch (error) {
+    console.error("❌❌❌ ORDER ERROR:", error);
+    alert("Failed to place order: " + error.message);
+    orderBtn.textContent = originalText;
+    orderBtn.disabled = false;
+  }
 }
 
 // Subcategories
@@ -497,6 +549,11 @@ function setMode(admin) {
 
 function setupEvents() {
   document
+    .getElementById("adminDashboardBtn")
+    ?.addEventListener("click", () => {
+      window.location.href = "admin-dashboard.html";
+    });
+  document
     .getElementById("cartIconBtn")
     ?.addEventListener("click", openCartModal);
   document
@@ -511,9 +568,29 @@ function setupEvents() {
       "click",
       () => (document.getElementById("cartModal").style.display = "none"),
     );
-  document
-    .getElementById("proceedToDeliveryBtn")
-    ?.addEventListener("click", showDelivery);
+
+  // Proceed to Delivery - Check login first (NO POPUP)
+  const proceedBtn = document.getElementById("proceedToDeliveryBtn");
+  if (proceedBtn) {
+    proceedBtn.addEventListener("click", () => {
+      if (cart.length === 0) {
+        alert("Cart is empty!");
+        return;
+      }
+
+      // Check if customer is logged in
+      const isLoggedIn = localStorage.getItem("customerLoggedIn") === "true";
+
+      if (!isLoggedIn) {
+        // Save return URL and redirect directly to login page
+        localStorage.setItem("returnUrl", window.location.href);
+        window.location.href = "customer-login.html";
+      } else {
+        showDelivery();
+      }
+    });
+  }
+
   document
     .getElementById("backToCartBtn")
     ?.addEventListener("click", showCartOnly);
@@ -621,6 +698,17 @@ function setupEvents() {
     if (e.includes("@")) alert("Subscribed!");
     else alert("Valid email");
   });
+
+  // Customer Logout
+  document
+    .getElementById("customerLogoutBtn")
+    ?.addEventListener("click", () => {
+      localStorage.removeItem("customerLoggedIn");
+      localStorage.removeItem("customerId");
+      localStorage.removeItem("customerEmail");
+      alert("Logged out successfully");
+      window.location.reload();
+    });
 }
 
 async function init() {
@@ -636,4 +724,51 @@ async function init() {
   document.getElementById("customerMain").style.display = "block";
 }
 
+// Check if customer is logged in
+function isCustomerLoggedIn() {
+  const user = localStorage.getItem("customerLoggedIn");
+  const userEmail = localStorage.getItem("customerEmail");
+  return user === "true" && userEmail;
+}
+
+// Save customer login info
+function setCustomerLogin(userId, email) {
+  localStorage.setItem("customerLoggedIn", "true");
+  localStorage.setItem("customerId", userId);
+  localStorage.setItem("customerEmail", email);
+}
+
+// Clear customer login on logout
+function clearCustomerLogin() {
+  localStorage.removeItem("customerLoggedIn");
+  localStorage.removeItem("customerId");
+  localStorage.removeItem("customerEmail");
+}
+
+// Show login/signup prompt before proceeding to delivery
+function showAuthPrompt() {
+  const modal = document.createElement("div");
+  modal.className = "auth-prompt-modal";
+  modal.innerHTML = `
+    <div class="auth-prompt-content">
+      <h3>🔐 Login Required</h3>
+      <p>Please login or create an account to continue with your order.</p>
+      <div class="auth-prompt-buttons">
+        <a href="customer-login.html" class="auth-prompt-btn login-btn">Login</a>
+        <a href="customer-signup.html" class="auth-prompt-btn signup-btn">Create Account</a>
+      </div>
+      <button class="auth-prompt-close">Continue as Guest</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector(".auth-prompt-close").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
 init();

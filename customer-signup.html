@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account - CR7 Clothing</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .signup-wrapper {
+        display: flex;
+        max-width: 900px;
+        width: 100%;
+        background: #141414;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .brand-section {
+        flex: 1;
+        background: linear-gradient(135deg, #ff7a00, #e06600);
+        padding: 35px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .brand-logo {
+        font-size: 32px;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      .brand-tagline h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      .brand-tagline p {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .brand-features {
+        list-style: none;
+        margin-top: 25px;
+      }
+
+      .brand-features li {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .form-section {
+        flex: 1;
+        padding: 30px 25px;
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+
+      .form-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 4px;
+      }
+
+      .form-header p {
+        color: #888;
+        font-size: 12px;
+      }
+
+      .input-group {
+        margin-bottom: 12px;
+      }
+
+      .input-group label {
+        display: block;
+        color: #aaa;
+        font-size: 11px;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 9px 12px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: white;
+        font-size: 13px;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #ff7a00;
+        box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.2);
+      }
+
+      .signup-btn {
+        width: 100%;
+        padding: 11px;
+        background: #ff7a00;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+        margin-bottom: 15px;
+      }
+
+      .signup-btn:hover {
+        background: #e06600;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+        color: #555;
+        font-size: 11px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #333;
+      }
+
+      .divider::before {
+        margin-right: 12px;
+      }
+
+      .divider::after {
+        margin-left: 12px;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      .login-link a {
+        color: #ff7a00;
+        text-decoration: none;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .back-link a {
+        color: #888;
+        text-decoration: none;
+        font-size: 12px;
+      }
+
+      .error-msg,
+      .success-msg {
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-bottom: 15px;
+        text-align: center;
+        display: none;
+      }
+
+      .error-msg {
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid #ff4444;
+        color: #ff4444;
+      }
+
+      .success-msg {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid #22c55e;
+        color: #22c55e;
+      }
+
+      @media (max-width: 700px) {
+        .signup-wrapper {
+          flex-direction: column;
+          max-width: 380px;
+        }
+
+        .brand-section {
+          padding: 25px;
+          text-align: center;
+        }
+
+        .brand-features {
+          display: none;
+        }
+
+        .form-section {
+          padding: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="signup-wrapper">
+      <div class="brand-section">
+        <div class="brand-logo">CR7</div>
+        <div class="brand-tagline">
+          <h2>Join Us!</h2>
+          <p>Create account for exclusive offers</p>
+        </div>
+        <ul class="brand-features">
+          <li><i class="fas fa-percent"></i> 15% Off First Order</li>
+          <li><i class="fas fa-gift"></i> Member Offers</li>
+          <li><i class="fas fa-clock"></i> Faster Checkout</li>
+        </ul>
+      </div>
+
+      <div class="form-section">
+        <div class="form-header">
+          <h1>Create Account</h1>
+          <p>Fill details to register</p>
+        </div>
+
+        <div id="errorMsg" class="error-msg"></div>
+        <div id="successMsg" class="success-msg"></div>
+
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter full name" />
+        </div>
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="Enter email" />
+        </div>
+
+        <div class="input-group">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" placeholder="Enter phone number" />
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Min 6 characters" />
+        </div>
+
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm password"
+          />
+        </div>
+
+        <button id="signupBtn" class="signup-btn">Create Account</button>
+
+        <div class="divider">OR</div>
+
+        <div class="login-link">
+          Already have account? <a href="customer-login.html">Login</a>
+        </div>
+
+        <div class="back-link">
+          <a href="/">← Back to Store</a>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { customerSignup, customerLogin } from "./auth.js";
+
+      const signupBtn = document.getElementById("signupBtn");
+      const fullName = document.getElementById("fullName");
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phone");
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirmPassword");
+      const errorMsg = document.getElementById("errorMsg");
+      const successMsg = document.getElementById("successMsg");
+
+      signupBtn.addEventListener("click", async () => {
+        const name = fullName.value.trim();
+        const mail = email.value.trim();
+        const mobile = phone.value.trim();
+        const pass = password.value;
+        const confirmPass = confirmPassword.value;
+
+        if (!name || !mail || !mobile || !pass) {
+          errorMsg.textContent = "Please fill all fields";
+          errorMsg.style.display = "block";
+          successMsg.style.display = "none";
+          return;
+        }
+
+        if (pass !== confirmPass) {
+          errorMsg.textContent = "Passwords do not match";
+          errorMsg.style.display = "block";
+          successMsg.style.display = "none";
+          return;
+        }
+
+        if (pass.length < 6) {
+          errorMsg.textContent = "Password must be at least 6 characters";
+          errorMsg.style.display = "block";
+          successMsg.style.display = "none";
+          return;
+        }
+
+        errorMsg.style.display = "none";
+        signupBtn.textContent = "Creating...";
+        signupBtn.disabled = true;
+
+        const result = await customerSignup(name, mail, mobile, pass);
+
+        if (result.success) {
+          const loginResult = await customerLogin(mail, pass);
+          if (loginResult.success) {
+            localStorage.setItem("customerLoggedIn", "true");
+            localStorage.setItem("customerId", loginResult.userId);
+            localStorage.setItem("customerEmail", mail);
+
+            successMsg.textContent = "Account created! Redirecting...";
+            successMsg.style.display = "block";
+
+            setTimeout(() => {
+              const returnUrl = localStorage.getItem("returnUrl");
+              if (returnUrl) {
+                localStorage.removeItem("returnUrl");
+                window.location.href = returnUrl;
+              } else {
+                window.location.href = "customer-dashboard.html";
+              }
+            }, 1500);
+          }
+        } else {
+          errorMsg.textContent = result.message;
+          errorMsg.style.display = "block";
+          signupBtn.textContent = "Create Account";
+          signupBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

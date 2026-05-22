@@ -42,11 +42,19 @@
             </button>
             <div class="profile-dropdown" id="profileDropdown">
               <a id="customerModeBtn">👥 Customer Mode</a>
-              <a id="adminModeBtn">🔐 Admin Panel</a>
+              <a
+                id="adminDashboardLink"
+                href="admin-dashboard.html"
+                style="color: #ff7a00; font-weight: bold"
+                >📊 Admin Dashboard</a
+              >
               <hr />
               <a id="viewCommunityBtn">💬 Community Hub</a>
               <a id="viewFeedbacksBtn">⭐ Customer Feedback</a>
-              <a id="logoutBtn" style="color: #ff4444">🚪 Logout</a>
+              <a id="customerLogoutBtn" style="color: #ff4444"
+                >🚪 Customer Logout</a
+              >
+              <a id="logoutBtn" style="color: #ff4444">🚪 Admin Logout</a>
             </div>
           </div>
         </div>
@@ -365,67 +373,6 @@
         </div>
       </div>
     </main>
-
-    <div class="container" id="adminPanelContainer" style="display: none">
-      <div class="admin-panel" id="adminPanel">
-        <h2 style="color: #ff7a00">🔐 Admin Control Center</h2>
-        <div class="admin-section">
-          <h3>📦 Manage Products</h3>
-          <div style="overflow-x: auto">
-            <table class="admin-table" id="adminStockTable">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminStockBody"></tbody>
-            </table>
-          </div>
-          <div style="display: flex; gap: 10px; margin-top: 20px">
-            <input type="text" id="newProdName" placeholder="Product Name" />
-            <input
-              type="number"
-              id="newProdPrice"
-              placeholder="Price $"
-              style="width: 100px"
-            />
-            <input
-              type="number"
-              id="newProdStock"
-              placeholder="Stock"
-              style="width: 80px"
-            />
-            <select id="newProdCat">
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="accessories">Accessories</option>
-            </select>
-            <button id="addProductBtn">➕ Add Product</button>
-          </div>
-        </div>
-        <div class="admin-section">
-          <h3>📢 Announcements</h3>
-          <input type="text" id="announcementText" style="width: 70%" /><button
-            id="postAnnouncementBtn"
-          >
-            Post
-          </button>
-          <div id="announcementsList"></div>
-        </div>
-        <div class="admin-section">
-          <h3>💬 Feedback</h3>
-          <div id="adminFeedbackList"></div>
-        </div>
-        <div class="admin-section">
-          <h3>📦 Orders</h3>
-          <div id="ordersList"></div>
-        </div>
-      </div>
-    </div>
 
     <div id="communityModal" class="community-modal">
       <div class="community-panel">

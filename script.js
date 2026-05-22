@@ -548,28 +548,31 @@ function setMode(admin) {
 }
 
 function setupEvents() {
+  // Admin Dashboard button
   document
-    .getElementById("adminDashboardBtn")
+    .getElementById("adminDashboardLink")
     ?.addEventListener("click", () => {
       window.location.href = "admin-dashboard.html";
     });
+
+  // Cart button
   document
     .getElementById("cartIconBtn")
     ?.addEventListener("click", openCartModal);
-  document
-    .querySelector(".cart-modal-close")
-    ?.addEventListener(
-      "click",
-      () => (document.getElementById("cartModal").style.display = "none"),
-    );
+
+  // Cart modal close
+  document.querySelector(".cart-modal-close")?.addEventListener("click", () => {
+    document.getElementById("cartModal").style.display = "none";
+  });
+
+  // Continue shopping button
   document
     .getElementById("continueShoppingBtn")
-    ?.addEventListener(
-      "click",
-      () => (document.getElementById("cartModal").style.display = "none"),
-    );
+    ?.addEventListener("click", () => {
+      document.getElementById("cartModal").style.display = "none";
+    });
 
-  // Proceed to Delivery - Check login first (NO POPUP)
+  // Proceed to delivery
   const proceedBtn = document.getElementById("proceedToDeliveryBtn");
   if (proceedBtn) {
     proceedBtn.addEventListener("click", () => {
@@ -577,12 +580,8 @@ function setupEvents() {
         alert("Cart is empty!");
         return;
       }
-
-      // Check if customer is logged in
       const isLoggedIn = localStorage.getItem("customerLoggedIn") === "true";
-
       if (!isLoggedIn) {
-        // Save return URL and redirect directly to login page
         localStorage.setItem("returnUrl", window.location.href);
         window.location.href = "customer-login.html";
       } else {
@@ -591,124 +590,158 @@ function setupEvents() {
     });
   }
 
+  // Back to cart
   document
     .getElementById("backToCartBtn")
     ?.addEventListener("click", showCartOnly);
+
+  // Proceed to payment
   document
     .getElementById("proceedToPaymentBtn")
     ?.addEventListener("click", showPayment);
+
+  // Back to delivery
   document
     .getElementById("backToDeliveryBtn")
     ?.addEventListener("click", showDelivery);
+
+  // Place order
   document
     .getElementById("placeOrderFinalBtn")
     ?.addEventListener("click", () => {
       if (
         document.querySelector("input[name='paymentMethod']:checked")?.value ===
         "cod"
-      )
+      ) {
         placeOrder();
-      else alert("Online payment coming soon!");
+      } else {
+        alert("Online payment coming soon!");
+      }
     });
-  document
-    .getElementById("closeSuccessBtn")
-    ?.addEventListener(
-      "click",
-      () => (document.getElementById("cartModal").style.display = "none"),
-    );
-  document
-    .querySelectorAll("input[name='paymentMethod']")
-    .forEach((r) =>
-      r.addEventListener(
-        "change",
-        () =>
-          (document.getElementById("onlinePaymentMsg").style.display =
-            r.value === "online" ? "block" : "none"),
-      ),
-    );
-  document
-    .getElementById("searchBtn")
-    ?.addEventListener(
-      "click",
-      () => (document.getElementById("searchModal").style.display = "flex"),
-    );
-  document
-    .getElementById("closeSearchBtn")
-    ?.addEventListener(
-      "click",
-      () => (document.getElementById("searchModal").style.display = "none"),
-    );
+
+  // Close success button
+  document.getElementById("closeSuccessBtn")?.addEventListener("click", () => {
+    document.getElementById("cartModal").style.display = "none";
+  });
+
+  // Payment method change
+  document.querySelectorAll("input[name='paymentMethod']").forEach((r) =>
+    r.addEventListener("change", () => {
+      document.getElementById("onlinePaymentMsg").style.display =
+        r.value === "online" ? "block" : "none";
+    }),
+  );
+
+  // Search button
+  document.getElementById("searchBtn")?.addEventListener("click", () => {
+    document.getElementById("searchModal").style.display = "flex";
+  });
+
+  // Close search
+  document.getElementById("closeSearchBtn")?.addEventListener("click", () => {
+    document.getElementById("searchModal").style.display = "none";
+  });
+
+  // Search input
   document.getElementById("searchInput")?.addEventListener("input", (e) => {
     const q = e.target.value.toLowerCase();
     const filtered = products.filter((p) => p.name.toLowerCase().includes(q));
     const res = document.getElementById("searchResults");
-    if (filtered.length === 0) res.innerHTML = "<div>No results</div>";
-    else
+    if (filtered.length === 0) {
+      res.innerHTML = "<div>No results</div>";
+    } else {
       res.innerHTML = filtered
         .map(
           (p) =>
             `<div class="search-result-item" data-id="${p.id}"><img src="${p.image}" style="width:40px;"><span>${p.name}</span><span>$${p.price}</span></div>`,
         )
         .join("");
-    document
-      .querySelectorAll(".search-result-item")
-      .forEach((el) =>
-        el.addEventListener("click", () => addToCart(el.dataset.id)),
-      );
+      document
+        .querySelectorAll(".search-result-item")
+        .forEach((el) =>
+          el.addEventListener("click", () => addToCart(el.dataset.id)),
+        );
+    }
   });
+
+  // Add product button (admin)
   document
     .getElementById("addProductBtn")
     ?.addEventListener("click", addNewProd);
+
+  // Post announcement
   document
     .getElementById("postAnnouncementBtn")
     ?.addEventListener("click", postAnnounce);
+
+  // Send chat message
   document
     .getElementById("sendChatMsgBtn")
     ?.addEventListener("click", sendMessage);
+
+  // Submit feedback
   document
     .getElementById("submitFeedbackModalBtn")
     ?.addEventListener("click", submitFeedback);
-  document
-    .getElementById("communityNavLink")
-    ?.addEventListener("click", () =>
-      document.getElementById("communityModal").classList.add("active"),
-    );
+
+  // Community modal
+  document.getElementById("communityNavLink")?.addEventListener("click", () => {
+    document.getElementById("communityModal").classList.add("active");
+  });
+
+  // Close community modal
   document
     .getElementById("closeCommunityBtn")
-    ?.addEventListener("click", () =>
-      document.getElementById("communityModal").classList.remove("active"),
-    );
+    ?.addEventListener("click", () => {
+      document.getElementById("communityModal").classList.remove("active");
+    });
+
+  // Customer mode (remove if not needed)
   document
     .getElementById("customerModeBtn")
     ?.addEventListener("click", () => setMode(false));
+
+  // Admin mode (remove if not needed)
   document
     .getElementById("adminModeBtn")
     ?.addEventListener("click", () => setMode(true));
-  document
-    .getElementById("profileIconBtn")
-    ?.addEventListener("click", () =>
-      document.getElementById("profileWrapper").classList.toggle("active"),
-    );
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".profile-wrapper"))
-      document.getElementById("profileWrapper")?.classList.remove("active");
-  });
-  document.getElementById("newsletterBtn")?.addEventListener("click", () => {
-    const e = document.getElementById("newsletterEmail").value;
-    if (e.includes("@")) alert("Subscribed!");
-    else alert("Valid email");
+
+  // Profile icon toggle
+  document.getElementById("profileIconBtn")?.addEventListener("click", () => {
+    document.getElementById("profileWrapper").classList.toggle("active");
   });
 
-  // Customer Logout
-  document
-    .getElementById("customerLogoutBtn")
-    ?.addEventListener("click", () => {
-      localStorage.removeItem("customerLoggedIn");
-      localStorage.removeItem("customerId");
-      localStorage.removeItem("customerEmail");
-      alert("Logged out successfully");
-      window.location.reload();
-    });
+  // Close profile dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".profile-wrapper")) {
+      document.getElementById("profileWrapper")?.classList.remove("active");
+    }
+  });
+
+  // Newsletter subscription
+  document.getElementById("newsletterBtn")?.addEventListener("click", () => {
+    const email = document.getElementById("newsletterEmail").value;
+    if (email.includes("@")) {
+      alert("Subscribed!");
+    } else {
+      alert("Valid email please");
+    }
+  });
+
+  // ========== SINGLE LOGOUT BUTTON ==========
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    // Clear all sessions
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminEmail");
+    localStorage.removeItem("adminUid");
+    localStorage.removeItem("customerLoggedIn");
+    localStorage.removeItem("customerId");
+    localStorage.removeItem("customerEmail");
+    localStorage.removeItem("returnUrl");
+
+    alert("Logged out successfully");
+    window.location.reload();
+  });
 }
 
 async function init() {

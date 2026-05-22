@@ -478,14 +478,18 @@
         customers = [];
       let selectedImageFile = null;
 
+      // Check admin session
       const adminSession = localStorage.getItem("adminLoggedIn");
-      if (adminSession === "true") {
+
+      if (adminSession !== "true") {
+        // Not logged in - show login prompt
+        document.getElementById("loginPrompt").style.display = "flex";
+        document.getElementById("adminContent").style.display = "none";
+      } else {
+        // Logged in - show dashboard
         document.getElementById("loginPrompt").style.display = "none";
         document.getElementById("adminContent").style.display = "block";
         loadAllData();
-      } else {
-        document.getElementById("loginPrompt").style.display = "flex";
-        document.getElementById("adminContent").style.display = "none";
       }
 
       const uploadArea = document.getElementById("imageUploadArea");

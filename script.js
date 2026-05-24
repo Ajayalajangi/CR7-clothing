@@ -108,34 +108,115 @@ function updateCartUI() {
 }
 
 function renderProducts(filter = null) {
-  let filtered =
-    filter === "all"
-      ? [...products].sort(() => Math.random() - 0.5)
-      : filter
-        ? products.filter((p) => p.category === filter)
-        : products;
-  const grid = document.getElementById("productGrid");
-  if (!grid) return;
-  grid.innerHTML = filtered
-    .map(
-      (p) => `
+  // ============ LOAD DATA FROM FIREBASE ============
+  async function loadAllData() {
+    try {
+      console.log("Loading products from Firebase...");
+
+      // Load Products
+      const productsRef = collection(db, "products");
+      const productsSnapshot = await getDocs(productsRef);
+
+      if (!productsSnapshot.empty) {
+        products = productsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(`✅ Loaded ${products.length} products`);
+      } else {
+        console.log("No products found in database");
+        products = [];
+      }
+
+      // Load Feedbacks
+      const feedbackSnapshot = await getDocs(collection(db, "feedbacks"));
+      if (!feedbackSnapshot.empty) {
+        feedbacks = feedbackSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Load Messages
+      const messagesSnapshot = await getDocs(collection(db, "messages"));
+      if (!messagesSnapshot.empty) {
+        communityMessages = messagesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Load Orders
+      const ordersSnapshot = await getDocs(collection(db, "orders"));
+      if (!ordersSnapshot.empty) {
+        orders = ordersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Load Announcements from localStorage
+      const savedAnnounce = localStorage.getItem("cr7_announce");
+      if (savedAnnounce) announcements = JSON.parse(savedAnnounce);
+
+      // Render everything
+      renderProducts();
+      renderCommunityMessages();
+      renderAdminFeedback();
+      renderOrders();
+      renderAnnouncements();
+      updateCartUI();
+    } catch (error) {
+      console.error("Error loading data:", error);
+      showToast("Error connecting to database");
+    }
+  }
+
+  // ============ RENDER PRODUCTS (Customer View) ============
+  function renderProducts(filterCategory = null) {
+    console.log("Rendering products, total products:", products.length);
+
+    let filtered =
+      filterCategory === "all"
+        ? [...products].sort(() => Math.random() - 0.5)
+        : filterCategory && filterCategory !== "all"
+          ? products.filter((p) => p.category === filterCategory)
+          : products;
+
+    const grid = document.getElementById("productGrid");
+    if (!grid) {
+      console.log("productGrid element not found!");
+      return;
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML =
+        "<div style='text-align:center; padding:40px;'>🛍️ No products found. Admin please add products.</div>";
+      return;
+    }
+
+    grid.innerHTML = filtered
+      .map(
+        (product) => `
     <div class="product-card">
-      <img class="product-img" src="${p.image}" alt="${p.name}">
+      <img class="product-img" src="${product.image || product.mainImage || "https://placehold.co/400x500/1a1a1a/ffffff?text=Product"}" alt="${product.name}">
       <div class="product-info">
-        <div class="product-title">${p.name}</div>
-        <div class="product-price">$${p.price}</div>
-        <div>📦 Stock: ${p.stock}</div>
-        <button class="add-to-cart" data-id="${p.id}">Add to Cart</button>
+        <div class="product-title">${product.name}</div>
+        <div class="product-price">$${product.price}</div>
+        <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock || 0}</div>
+        <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
       </div>
     </div>
   `,
-    )
-    .join("");
-  document
-    .querySelectorAll(".add-to-cart")
-    .forEach((btn) =>
-      btn.addEventListener("click", () => addToCart(btn.dataset.id)),
-    );
+      )
+      .join("");
+
+    document.querySelectorAll(".add-to-cart").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        addToCart(btn.getAttribute("data-id"));
+      });
+    });
+  }
 }
 
 function addToCart(id) {

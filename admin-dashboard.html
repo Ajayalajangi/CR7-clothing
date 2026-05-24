@@ -531,12 +531,37 @@
       }
 
       async function uploadImage() {
-        if (!selectedImageFile)
+        if (!selectedImageFile) {
+          console.log("No image selected, using placeholder");
           return "https://placehold.co/400x500/1a1a1a/ffffff?text=No+Image";
-        const fileName = `products/${Date.now()}_${selectedImageFile.name}`;
-        const imageRef = ref(storage, fileName);
-        await uploadBytes(imageRef, selectedImageFile);
-        return await getDownloadURL(imageRef);
+        }
+
+        const progressDiv = document.getElementById("uploadProgress");
+        progressDiv.style.display = "block";
+
+        try {
+          // Create unique filename
+          const fileName = `products/${Date.now()}_${selectedImageFile.name}`;
+          const imageRef = ref(storage, fileName);
+
+          console.log("Uploading image:", fileName);
+
+          // Upload to Firebase Storage
+          const snapshot = await uploadBytes(imageRef, selectedImageFile);
+          console.log("Upload successful, getting download URL...");
+
+          // Get the download URL
+          const downloadURL = await getDownloadURL(imageRef);
+          console.log("Download URL:", downloadURL);
+
+          progressDiv.style.display = "none";
+          return downloadURL;
+        } catch (error) {
+          console.error("Upload error:", error);
+          progressDiv.style.display = "none";
+          alert("Image upload failed: " + error.message);
+          return "https://placehold.co/400x500/1a1a1a/ffffff?text=Upload+Failed";
+        }
       }
 
       async function addProductWithImage() {
@@ -553,26 +578,61 @@
           return;
         }
 
-        const image = await uploadImage();
-        await addDoc(collection(db, "products"), {
-          name,
-          price,
-          stock: stock || 0,
-          category,
-          image,
-          description,
-          createdAt: new Date(),
-        });
+        const addBtn = document.getElementById("addProductBtn");
+        addBtn.textContent = "Uploading Image...";
+        addBtn.disabled = true;
 
-        alert(`✅ "${name}" added successfully!`);
-        selectedImageFile = null;
-        imagePreview.innerHTML = "";
-        document.getElementById("prodName").value = "";
-        document.getElementById("prodPrice").value = "";
-        document.getElementById("prodStock").value = "";
-        document.getElementById("prodDescription").value = "";
-        loadAllData();
-        switchTab("products");
+        // Upload image first
+        let imageUrl =
+          "https://placehold.co/400x500/1a1a1a/ffffff?text=" +
+          encodeURIComponent(name);
+
+        if (selectedImageFile) {
+          imageUrl = await uploadImage();
+          console.log("Image URL obtained:", imageUrl);
+        } else {
+          console.log("No image selected, using placeholder");
+        }
+
+        addBtn.textContent = "Saving Product...";
+
+        const productData = {
+          name: name,
+          price: price,
+          stock: stock || 0,
+          category: category,
+          image: imageUrl,
+          mainImage: imageUrl,
+          description: description || "Premium quality product",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        console.log("Saving product:", productData);
+
+        try {
+          const docRef = await addDoc(collection(db, "products"), productData);
+          console.log("Product saved with ID:", docRef.id);
+          alert(`✅ "${name}" added successfully!`);
+
+          // Clear form
+          selectedImageFile = null;
+          imagePreview.innerHTML = "";
+          document.getElementById("prodName").value = "";
+          document.getElementById("prodPrice").value = "";
+          document.getElementById("prodStock").value = "";
+          document.getElementById("prodDescription").value = "";
+
+          // Reload data
+          await loadAllData();
+          switchTab("products");
+        } catch (error) {
+          console.error("Error adding product:", error);
+          alert("Failed to add product: " + error.message);
+        } finally {
+          addBtn.textContent = "➕ Add Product";
+          addBtn.disabled = false;
+        }
       }
 
       async function loadAllData() {

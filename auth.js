@@ -22,6 +22,7 @@ import {
   addDoc,
   orderBy,
   Timestamp,
+  increment,
 } from "./firebase-config.js";
 
 // ============ CUSTOMER AUTHENTICATION ============
@@ -129,9 +130,6 @@ async function sendResetOTP(email) {
 
 // Reset Password (after OTP verification)
 async function resetPassword(email, newPassword) {
-  // Note: Firebase handles password reset via email link
-  // This function would be called after user clicks the reset link
-  // For security, we redirect to Firebase's reset page
   await sendPasswordResetEmail(auth, email);
   return { success: true, message: "Password reset email sent" };
 }
@@ -168,51 +166,34 @@ async function updateCustomerProfile(userId, updates) {
 }
 
 // Place Order (Customer must be logged in)
-async function placeOrder(userId, cartItems, total, address, paymentMethod) {
+async function placeOrder(customerId, customerName, items, total, shippingAddress) {
   try {
-    // Get customer details
-    const customerDoc = await getDoc(doc(db, "customers", userId));
-    const customerData = customerDoc.data();
-
-    // Create order
-    const orderData = {
-      userId: userId,
-      customerName: customerData.fullName,
-      customerEmail: customerData.email,
-      customerPhone: customerData.phone,
-      items: cartItems,
+    const orderRef = await addDoc(collection(db, "orders"), {
+      customerId: customerId,
+      customer: { name: customerName },  // Use consistent 'customer' object
+      customerName: customerName,  // Keep both for backward compatibility
+      items: items,
       total: total,
-      address: address,
-      paymentMethod: paymentMethod,
-      paymentStatus: paymentMethod === "cod" ? "pending" : "pending",
+      shippingAddress: shippingAddress,
       orderStatus: "pending",
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    };
+      status: "pending",  // Add both for compatibility
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
-    const orderRef = await addDoc(collection(db, "orders"), orderData);
-
-    // Update customer's orders array
-    const customerOrders = customerData.orders || [];
-    customerOrders.push(orderRef.id);
-    await updateDoc(doc(db, "customers", userId), { orders: customerOrders });
-
-    // Update product stock
-    for (const item of cartItems) {
-      const productRef = doc(db, "products", item.id);
-      const productDoc = await getDoc(productRef);
-      if (productDoc.exists()) {
-        const currentStock = productDoc.data().stock;
-        await updateDoc(productRef, { stock: currentStock - item.quantity });
+    for (const item of items) {
+      if (item.id) {
+        const productRef = doc(db, "products", item.id);
+        await updateDoc(productRef, { stock: increment(-item.quantity) });
       }
     }
-
     return { success: true, orderId: orderRef.id };
   } catch (error) {
-    console.error("Order error:", error);
-    return { success: false, message: "Failed to place order" };
+    console.error("Place order error:", error);
+    return { success: false, message: "Failed to update order or inventory" };
   }
 }
+
 
 // Get Customer Orders
 async function getCustomerOrders(userId) {
@@ -220,7 +201,7 @@ async function getCustomerOrders(userId) {
     const ordersRef = collection(db, "orders");
     const q = query(
       ordersRef,
-      where("userId", "==", userId),
+      where("customerId", "==", userId),
       orderBy("createdAt", "desc"),
     );
     const querySnapshot = await getDocs(q);
@@ -239,11 +220,43 @@ async function getCustomerOrders(userId) {
 
 // ============ ADMIN FUNCTIONS ============
 
-// Add Product (Admin only)
-async function addProduct(productData) {
+// FIXED BUG: Added missing getAllProducts function to load the table data
+async function getAllProducts() {
   try {
+    const productsRef = collection(db, "products");
+    const q = query(productsRef, orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    const products = [];
+    querySnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+
+    return { success: true, products: products };
+  } catch (error) {
+    console.error("Get products error:", error);
+    return { success: false, products: [] };
+  }
+}
+
+// FIXED GAP: Updated addProduct to take the file data payload cleanly
+async function addProduct(productData, imageFile) {
+  try {
+    let finalImageUrl = "https://placehold.co/400x500/1a1a1a/ffffff?text=" + encodeURIComponent(productData.name);
+
+    // Optional Helper: Handle local file preview as base64 data string if image exists
+    if (imageFile) {
+      finalImageUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(imageFile);
+      });
+    }
+
     const productRef = await addDoc(collection(db, "products"), {
       ...productData,
+      image: finalImageUrl,
+      mainImage: finalImageUrl,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     });
@@ -335,9 +348,9 @@ async function updateOrderStatus(orderId, status) {
 // Get Dashboard Stats (Admin only)
 async function getDashboardStats() {
   try {
-    const productsSnapshot = await getDocs(collection(db, "products"));
-    const ordersSnapshot = await getDocs(collection(db, "orders"));
-    const customersSnapshot = await getDocs(collection(db, "customers"));
+    const productsSnapshot = await getDocs(collection(db, \"products\"));
+    const ordersSnapshot = await getDocs(collection(db, \"orders\"));
+    const customersSnapshot = await getDocs(collection(db, \"customers\"));
 
     let totalSales = 0;
     let pendingOrders = 0;
@@ -376,6 +389,7 @@ export {
   placeOrder,
   getCustomerOrders,
   // Admin functions
+  getAllProducts, // Now successfully exported for admin use
   addProduct,
   updateProduct,
   deleteProduct,

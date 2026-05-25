@@ -28,51 +28,39 @@ let feedbacks = [];
 let announcements = ["🔥 New Summer Collection!"];
 let orders = [];
 
-// ============ LOAD PRODUCTS FROM FIREBASE ============
+// ============ LOAD ALL DATA ============
 async function loadAllData() {
   try {
     console.log("🟢 Loading products from Firebase...");
 
     // Load Products
     const productsSnapshot = await getDocs(collection(db, "products"));
+    products = [];
+    productsSnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    console.log(`✅ Loaded ${products.length} products`);
 
-    console.log("Products found:", productsSnapshot.size);
-
-    if (!productsSnapshot.empty) {
-      products = productsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log("✅ Loaded", products.length, "products");
-    } else {
-      console.log("❌ No products found in database");
-      products = [];
-    }
-
-    // Load other data
+    // Load Feedbacks
     const feedbackSnapshot = await getDocs(collection(db, "feedbacks"));
-    if (!feedbackSnapshot.empty) {
-      feedbacks = feedbackSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    }
+    feedbacks = [];
+    feedbackSnapshot.forEach((doc) => {
+      feedbacks.push({ id: doc.id, ...doc.data() });
+    });
 
+    // Load Messages
     const messagesSnapshot = await getDocs(collection(db, "messages"));
-    if (!messagesSnapshot.empty) {
-      communityMessages = messagesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    }
+    communityMessages = [];
+    messagesSnapshot.forEach((doc) => {
+      communityMessages.push({ id: doc.id, ...doc.data() });
+    });
 
+    // Load Orders
     const ordersSnapshot = await getDocs(collection(db, "orders"));
-    if (!ordersSnapshot.empty) {
-      orders = ordersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    }
+    orders = [];
+    ordersSnapshot.forEach((doc) => {
+      orders.push({ id: doc.id, ...doc.data() });
+    });
 
     const savedAnnounce = localStorage.getItem("cr7_announce");
     if (savedAnnounce) announcements = JSON.parse(savedAnnounce);
@@ -120,7 +108,7 @@ function renderProducts(filterCategory = null) {
       <img class="product-img" src="${product.image || "https://placehold.co/400x500/1a1a1a/ffffff?text=Product"}" alt="${product.name}">
       <div class="product-info">
         <div class="product-title">${product.name}</div>
-        <div class="product-price">$${product.price}</div>
+        <div class="product-price">₹${product.price}</div>
         <div style="font-size:0.75rem; color:#888;">📦 Stock: ${product.stock || 0}</div>
         <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
       </div>
@@ -178,294 +166,177 @@ function addToCart(id) {
   showToast(`${product.name} added to cart`);
 }
 
-// ============ PAYMENT FUNCTIONS ============
-let razorpayKeyId = "YOUR_RAZORPAY_KEY_ID"; // Replace with your actual Key ID
-
-async function processPayment() {
-  const paymentMethod = document.querySelector(
-    'input[name="paymentMethod"]:checked',
-  )?.value;
-
-  // Get order total
-  let total = 0;
-  for (const item of cart) {
-    total += item.price * item.quantity;
-  }
-
-  if (total <= 0) {
+// ============ CART MODAL ============
+function openCartModal() {
+  if (cart.length === 0) {
     alert("Cart is empty!");
     return;
   }
-
-  // Show loading
-  const payBtn = document.getElementById("processPaymentBtn");
-  payBtn.textContent = "⏳ Processing...";
-  payBtn.disabled = true;
-
-  // Create order on backend
-  try {
-    const orderResponse = await fetch(
-      "http://localhost:5000/api/create-order",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: total,
-          currency: "INR",
-        }),
-      },
-    );
-
-    const order = await orderResponse.json();
-
-    // Configure Razorpay options
-    const options = {
-      key: razorpayKeyId,
-      amount: order.amount,
-      currency: order.currency,
-      name: "CR7 Clothing",
-      description: `Order ${order.id}`,
-      order_id: order.id,
-      handler: function (response) {
-        verifyPayment(response, order.id, total);
-      },
-      prefill: {
-        name: document.getElementById("deliveryName")?.value || "",
-        email: document.getElementById("deliveryEmail")?.value || "",
-        contact: document.getElementById("deliveryPhone")?.value || "",
-      },
-      theme: {
-        color: "#ff7a00",
-      },
-      modal: {
-        ondismiss: function () {
-          payBtn.textContent = "Pay Now 💰";
-          payBtn.disabled = false;
-        },
-      },
-    };
-
-    const razorpayInstance = new Razorpay(options);
-    razorpayInstance.open();
-  } catch (error) {
-    console.error("Payment error:", error);
-    showPaymentAnimation("failed");
-    payBtn.textContent = "Pay Now 💰";
-    payBtn.disabled = false;
-  }
-}
-// ============ RAZORPAY PAYMENT ============
-async function processRazorpayPayment(total) {
-  try {
-    // Get Razorpay Key from server
-    const keyResponse = await fetch("http://localhost:5000/api/get-key");
-    const { key_id } = await keyResponse.json();
-
-    // Create order
-    const orderResponse = await fetch(
-      "http://localhost:5000/api/create-order",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total, currency: "INR" }),
-      },
-    );
-
-    const order = await orderResponse.json();
-
-    const options = {
-      key: key_id,
-      amount: order.amount,
-      currency: order.currency,
-      name: "CR7 Clothing",
-      description: "Fashion Purchase",
-      order_id: order.id,
-      handler: async function (response) {
-        // Verify payment
-        const verifyRes = await fetch(
-          "http://localhost:5000/api/verify-payment",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          },
-        );
-
-        const result = await verifyRes.json();
-
-        if (result.success) {
-          showPaymentSuccessAnimation();
-          await saveOrderToFirebase(result.paymentId, total);
-          clearCartAfterPayment();
-        } else {
-          showPaymentFailedAnimation();
-        }
-      },
-      prefill: {
-        name: document.getElementById("deliveryName")?.value || "",
-        email: document.getElementById("deliveryEmail")?.value || "",
-        contact: document.getElementById("deliveryPhone")?.value || "",
-      },
-      theme: { color: "#ff7a00" },
-    };
-
-    const razorpay = new Razorpay(options);
-    razorpay.open();
-  } catch (error) {
-    console.error("Payment error:", error);
-    showPaymentFailedAnimation();
-  }
+  renderCartList();
+  document.getElementById("cartModal").style.display = "flex";
+  showCartOnly();
 }
 
-async function verifyPayment(response, orderId, total) {
-  const payBtn = document.getElementById("processPaymentBtn");
-
-  try {
-    const verifyResponse = await fetch(
-      "http://localhost:5000/api/verify-payment",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-        }),
-      },
+function renderCartList() {
+  const container = document.getElementById("cartItemsList");
+  if (cart.length === 0) {
+    container.innerHTML =
+      "<div style='text-align:center;padding:40px;'>Cart empty</div>";
+    return;
+  }
+  let subtotal = 0;
+  container.innerHTML = cart
+    .map((i) => {
+      subtotal += i.price * i.quantity;
+      return `<div class="cart-item"><div><div class="cart-item-name">${i.name}</div><div>₹${i.price}</div><div class="cart-item-quantity"><button class="qty-minus" data-id="${i.id}">-</button><span>${i.quantity}</span><button class="qty-plus" data-id="${i.id}">+</button></div></div><button class="cart-remove" data-id="${i.id}">🗑️</button></div>`;
+    })
+    .join("");
+  document.getElementById("cartSubtotal").innerHTML = `₹${subtotal}`;
+  document.getElementById("cartGrandTotal").innerHTML = `₹${subtotal}`;
+  document
+    .querySelectorAll(".qty-minus")
+    .forEach((b) =>
+      b.addEventListener("click", () => updateQty(b.dataset.id, -1)),
     );
+  document
+    .querySelectorAll(".qty-plus")
+    .forEach((b) =>
+      b.addEventListener("click", () => updateQty(b.dataset.id, 1)),
+    );
+  document
+    .querySelectorAll(".cart-remove")
+    .forEach((b) =>
+      b.addEventListener("click", () => removeFromCart(b.dataset.id)),
+    );
+}
 
-    const result = await verifyResponse.json();
-
-    if (result.success) {
-      // Payment successful - save order
-      await saveOrderToFirebase(
-        "success",
-        orderId,
-        total,
-        response.razorpay_payment_id,
-      );
-      showPaymentAnimation("success");
-      clearCartAndRedirect();
+function updateQty(id, change) {
+  const item = cart.find((i) => i.id === id);
+  if (item) {
+    const newQty = item.quantity + change;
+    if (newQty <= 0) {
+      removeFromCart(id);
     } else {
-      showPaymentAnimation("failed");
-      payBtn.textContent = "Pay Now 💰";
-      payBtn.disabled = false;
+      item.quantity = newQty;
+      updateCartUI();
+      renderCartList();
     }
-  } catch (error) {
-    console.error("Verification error:", error);
-    showPaymentAnimation("failed");
-    payBtn.textContent = "Pay Now 💰";
-    payBtn.disabled = false;
   }
 }
 
-async function saveOrderToFirebase(status, orderId, total, paymentId) {
-  const name = document.getElementById("deliveryName")?.value;
-  const email = document.getElementById("deliveryEmail")?.value;
-  const phone = document.getElementById("deliveryPhone")?.value;
-  const address = document.getElementById("deliveryAddress")?.value;
+function removeFromCart(id) {
+  cart = cart.filter((i) => i.id !== id);
+  updateCartUI();
+  renderCartList();
+  if (cart.length === 0)
+    document.getElementById("cartModal").style.display = "none";
+}
+
+function showCartOnly() {
+  document.getElementById("cartItemsList").style.display = "block";
+  document.getElementById("deliverySection").style.display = "none";
+  document.getElementById("paymentSection").style.display = "none";
+  document.getElementById("orderSuccessAnim").style.display = "none";
+}
+
+function showDelivery() {
+  document.getElementById("cartItemsList").style.display = "none";
+  document.getElementById("deliverySection").style.display = "block";
+}
+
+function showPayment() {
+  document.getElementById("deliverySection").style.display = "none";
+  document.getElementById("paymentSection").style.display = "block";
+}
+
+// ============ PLACE ORDER (COD) ============
+async function placeOrder() {
+  const name = document.getElementById("deliveryName")?.value.trim();
+  const email = document.getElementById("deliveryEmail")?.value.trim();
+  const phone = document.getElementById("deliveryPhone")?.value.trim();
+  const addr = document.getElementById("deliveryAddress")?.value.trim();
+  const notes = document.getElementById("deliveryNotes")?.value.trim();
+
+  if (!name || !email || !phone || !addr) {
+    alert("Please fill all delivery details");
+    return;
+  }
+
+  const orderBtn = document.getElementById("placeOrderFinalBtn");
+  const originalText = orderBtn.textContent;
+  orderBtn.textContent = "⏳ Placing Order...";
+  orderBtn.disabled = true;
+
+  let total = 0;
+  for (const item of cart) {
+    total += item.price * item.quantity;
+    const prod = products.find((p) => p.id === item.id);
+    if (prod) {
+      prod.stock -= item.quantity;
+      await updateDoc(doc(db, "products", prod.id), { stock: prod.stock });
+    }
+  }
 
   const orderData = {
-    orderId: orderId,
-    razorpayPaymentId: paymentId,
-    customer: { name, email, phone, address },
+    orderId: "ORD" + Date.now(),
+    customer: { name, email, phone, address: addr, notes: notes || "" },
     items: cart.map((i) => ({
+      id: i.id,
       name: i.name,
       quantity: i.quantity,
       price: i.price,
     })),
     total: total,
-    paymentStatus: status,
-    orderStatus: status === "success" ? "confirmed" : "pending",
     date: new Date().toLocaleString(),
     timestamp: new Date(),
+    status: "pending",
+    paymentMethod: "COD",
   };
 
-  await addDoc(collection(db, "orders"), orderData);
-
-  // Update product stock
-  for (const item of cart) {
-    const product = products.find((p) => p.id === item.id);
-    if (product) {
-      product.stock -= item.quantity;
-      await updateDoc(doc(db, "products", product.id), {
-        stock: product.stock,
-      });
-    }
-  }
-
-  // Clear cart
-  cart = [];
-  updateCartUI();
-  localStorage.setItem("cr7_cart", JSON.stringify(cart));
-}
-
-function showPaymentAnimation(status) {
-  // Hide all animations
-  document.getElementById("paymentSuccessAnim").style.display = "none";
-  document.getElementById("paymentFailedAnim").style.display = "none";
-  document.getElementById("paymentPendingAnim").style.display = "none";
-
-  // Show the relevant animation
-  if (status === "success") {
-    document.getElementById("paymentSuccessAnim").style.display = "block";
-  } else if (status === "failed") {
-    document.getElementById("paymentFailedAnim").style.display = "block";
-  } else if (status === "pending") {
-    document.getElementById("paymentPendingAnim").style.display = "block";
-  }
-
-  // Hide payment section
-  document.getElementById("paymentSection").style.display = "none";
-}
-
-function clearCartAndRedirect() {
-  setTimeout(() => {
-    document.getElementById("cartModal").style.display = "none";
-    // Reset to home page or show success
-    window.location.reload();
-  }, 3000);
-}
-
-// Update payment method selection to show/hide UPI options
-document.querySelectorAll("input[name='paymentMethod']").forEach((radio) => {
-  radio.addEventListener("change", (e) => {
-    const upiOptions = document.getElementById("upiOptions");
-    if (upiOptions) {
-      upiOptions.style.display = e.target.value === "upi" ? "block" : "none";
-    }
-  });
-});
-
-// Replace the placeOrderFinalBtn event listener
-document.getElementById("placeOrderFinalBtn")?.addEventListener("click", () => {
-  const paymentMethod = document.querySelector(
-    "input[name='paymentMethod']:checked",
-  )?.value;
-  if (paymentMethod === "cod") {
-    placeOrder(); // Your existing COD order function
-  } else {
-    processPayment(); // New payment function
-  }
-});
-
-// ============ OTHER FUNCTIONS (keep existing ones) ============
-function renderCommunityMessages() {
-  const cont = document.getElementById("chatMessagesList");
-  if (cont) {
-    cont.innerHTML = communityMessages
-      .map(
-        (m) =>
-          `<div><strong>${m.sender}:</strong> ${m.text}<br><small>${m.time}</small></div>`,
-      )
-      .join("");
+  try {
+    await addDoc(collection(db, "orders"), orderData);
+    cart = [];
+    updateCartUI();
+    localStorage.setItem("cr7_cart", JSON.stringify(cart));
+    document.getElementById("paymentSection").style.display = "none";
+    document.getElementById("orderSuccessAnim").style.display = "block";
+    orderBtn.textContent = originalText;
+    orderBtn.disabled = false;
+    setTimeout(() => {
+      document.getElementById("cartModal").style.display = "none";
+      document.getElementById("orderSuccessAnim").style.display = "none";
+      showCartOnly();
+      document.getElementById("deliveryName").value = "";
+      document.getElementById("deliveryEmail").value = "";
+      document.getElementById("deliveryPhone").value = "";
+      document.getElementById("deliveryAddress").value = "";
+      document.getElementById("deliveryNotes").value = "";
+    }, 3000);
+  } catch (error) {
+    console.error("Order error:", error);
+    alert("Failed to place order");
+    orderBtn.textContent = originalText;
+    orderBtn.disabled = false;
   }
 }
 
+// ============ CATEGORY FILTERS ============
+function setupSubcats() {
+  document
+    .querySelector('.category-card[data-cat="men"]')
+    ?.addEventListener("click", () => renderProducts("men"));
+  document
+    .querySelector('.category-card[data-cat="women"]')
+    ?.addEventListener("click", () => renderProducts("women"));
+  document
+    .querySelector('.category-card[data-cat="accessories"]')
+    ?.addEventListener("click", () => renderProducts("accessories"));
+  document
+    .querySelector('.category-card[data-cat="all"]')
+    ?.addEventListener("click", () => renderProducts("all"));
+}
+
+// ============ ADMIN FUNCTIONS ============
 function renderAdminFeedback() {
   const cont = document.getElementById("adminFeedbackList");
   if (cont) {
@@ -491,7 +362,7 @@ function renderOrders() {
     cont.innerHTML = orders
       .map(
         (o) =>
-          `<div><strong>Order ${o.id}</strong><br>Items: ${o.items?.map((i) => `${i.name} x${i.quantity}`).join(", ")}<br>Total: $${o.total}<br>Status: ${o.status}</div>`,
+          `<div><strong>Order ${o.id}</strong><br>Items: ${o.items?.map((i) => `${i.name} x${i.quantity}`).join(", ")}<br>Total: ₹${o.total}<br>Status: ${o.status}</div>`,
       )
       .join("");
   }
@@ -517,6 +388,18 @@ function renderAnnouncements() {
   const banner = document.getElementById("announcementBanner");
   if (banner) {
     banner.innerHTML = announcements[0] ? `🔥 ${announcements[0]} 🔥` : "";
+  }
+}
+
+function renderCommunityMessages() {
+  const cont = document.getElementById("chatMessagesList");
+  if (cont) {
+    cont.innerHTML = communityMessages
+      .map(
+        (m) =>
+          `<div><strong>${m.sender}:</strong> ${m.text}<br><small>${m.time}</small></div>`,
+      )
+      .join("");
   }
 }
 
@@ -562,35 +445,137 @@ function setMode(admin) {
 
 // ============ EVENT LISTENERS ============
 function setupEvents() {
-  document.getElementById("cartIconBtn")?.addEventListener("click", () => {
-    if (cart.length === 0) alert("Cart is empty!");
-    else alert(`Cart has ${cart.length} items`);
+  document
+    .getElementById("cartIconBtn")
+    ?.addEventListener("click", openCartModal);
+  document.querySelector(".cart-modal-close")?.addEventListener("click", () => {
+    document.getElementById("cartModal").style.display = "none";
   });
+  document
+    .getElementById("continueShoppingBtn")
+    ?.addEventListener("click", () => {
+      document.getElementById("cartModal").style.display = "none";
+    });
+
+  const proceedBtn = document.getElementById("proceedToDeliveryBtn");
+  if (proceedBtn) {
+    proceedBtn.addEventListener("click", () => {
+      if (cart.length === 0) {
+        alert("Cart is empty!");
+        return;
+      }
+      const isLoggedIn = localStorage.getItem("customerLoggedIn") === "true";
+      if (!isLoggedIn) {
+        localStorage.setItem("returnUrl", window.location.href);
+        window.location.href = "customer-login.html";
+      } else {
+        showDelivery();
+      }
+    });
+  }
+
+  document
+    .getElementById("backToCartBtn")
+    ?.addEventListener("click", showCartOnly);
+  document
+    .getElementById("proceedToPaymentBtn")
+    ?.addEventListener("click", showPayment);
+  document
+    .getElementById("backToDeliveryBtn")
+    ?.addEventListener("click", showDelivery);
+  document
+    .getElementById("placeOrderFinalBtn")
+    ?.addEventListener("click", () => {
+      const paymentMethod = document.querySelector(
+        "input[name='paymentMethod']:checked",
+      )?.value;
+      if (paymentMethod === "cod") placeOrder();
+      else alert("Online payment coming soon!");
+    });
+  document.getElementById("closeSuccessBtn")?.addEventListener("click", () => {
+    document.getElementById("cartModal").style.display = "none";
+  });
+  document.querySelectorAll("input[name='paymentMethod']").forEach((r) =>
+    r.addEventListener("change", () => {
+      document.getElementById("onlinePaymentMsg").style.display =
+        r.value === "online" ? "block" : "none";
+    }),
+  );
 
   document.getElementById("searchBtn")?.addEventListener("click", () => {
     document.getElementById("searchModal").style.display = "flex";
   });
-
   document.getElementById("closeSearchBtn")?.addEventListener("click", () => {
     document.getElementById("searchModal").style.display = "none";
   });
-
-  document.getElementById("communityNavLink")?.addEventListener("click", () => {
-    document.getElementById("communityModal").classList.add("active");
+  document.getElementById("searchInput")?.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = products.filter((p) => p.name.toLowerCase().includes(q));
+    const res = document.getElementById("searchResults");
+    if (filtered.length === 0) res.innerHTML = "<div>No results</div>";
+    else
+      res.innerHTML = filtered
+        .map(
+          (p) =>
+            `<div class="search-result-item" data-id="${p.id}"><img src="${p.image}" style="width:40px;"><span>${p.name}</span><span>₹${p.price}</span></div>`,
+        )
+        .join("");
+    document
+      .querySelectorAll(".search-result-item")
+      .forEach((el) =>
+        el.addEventListener("click", () => addToCart(el.dataset.id)),
+      );
   });
 
   document
-    .getElementById("closeCommunityBtn")
-    ?.addEventListener("click", () => {
-      document.getElementById("communityModal").classList.remove("active");
-    });
-
+    .getElementById("addProductBtn")
+    ?.addEventListener("click", addNewProd);
+  document
+    .getElementById("postAnnouncementBtn")
+    ?.addEventListener("click", postAnnounce);
   document
     .getElementById("sendChatMsgBtn")
     ?.addEventListener("click", sendMessage);
   document
     .getElementById("submitFeedbackModalBtn")
     ?.addEventListener("click", submitFeedback);
+  document.getElementById("communityNavLink")?.addEventListener("click", () => {
+    document.getElementById("communityModal").classList.add("active");
+  });
+  document
+    .getElementById("closeCommunityBtn")
+    ?.addEventListener("click", () => {
+      document.getElementById("communityModal").classList.remove("active");
+    });
+  document
+    .getElementById("customerModeBtn")
+    ?.addEventListener("click", () => setMode(false));
+  document
+    .getElementById("adminModeBtn")
+    ?.addEventListener("click", () => setMode(true));
+  document.getElementById("profileIconBtn")?.addEventListener("click", () => {
+    document.getElementById("profileWrapper").classList.toggle("active");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".profile-wrapper"))
+      document.getElementById("profileWrapper")?.classList.remove("active");
+  });
+  document.getElementById("newsletterBtn")?.addEventListener("click", () => {
+    const email = document.getElementById("newsletterEmail").value;
+    if (email.includes("@")) alert("Subscribed!");
+    else alert("Valid email please");
+  });
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminEmail");
+    localStorage.removeItem("adminUid");
+    localStorage.removeItem("customerLoggedIn");
+    localStorage.removeItem("customerId");
+    localStorage.removeItem("customerEmail");
+    localStorage.removeItem("returnUrl");
+    alert("Logged out successfully");
+    window.location.reload();
+  });
   document
     .getElementById("adminDashboardLink")
     ?.addEventListener("click", () => {
@@ -598,28 +583,30 @@ function setupEvents() {
     });
 }
 
-// ============ SUBCATEGORIES ============
-function setupSubcats() {
-  document
-    .querySelector('.category-card[data-cat="men"]')
-    ?.addEventListener("click", () => {
-      renderProducts("men");
-    });
-  document
-    .querySelector('.category-card[data-cat="women"]')
-    ?.addEventListener("click", () => {
-      renderProducts("women");
-    });
-  document
-    .querySelector('.category-card[data-cat="accessories"]')
-    ?.addEventListener("click", () => {
-      renderProducts("accessories");
-    });
-  document
-    .querySelector('.category-card[data-cat="all"]')
-    ?.addEventListener("click", () => {
-      renderProducts("all");
-    });
+function addNewProd() {
+  const name = document.getElementById("newProdName")?.value.trim();
+  const price = parseFloat(document.getElementById("newProdPrice")?.value);
+  const stock = parseInt(document.getElementById("newProdStock")?.value);
+  const cat = document.getElementById("newProdCat")?.value;
+  if (!name) return;
+  addDoc(collection(db, "products"), {
+    name,
+    price,
+    category: cat,
+    stock,
+    type: "general",
+    image: "https://placehold.co/400x500/1a1a1a/ffffff?text=New",
+  });
+  renderProducts();
+}
+
+function postAnnounce() {
+  const txt = document.getElementById("announcementText")?.value.trim();
+  if (!txt) return;
+  announcements.unshift(txt);
+  localStorage.setItem("cr7_announce", JSON.stringify(announcements));
+  renderAnnouncements();
+  document.getElementById("announcementText").value = "";
 }
 
 // ============ INITIALIZE ============
@@ -627,12 +614,13 @@ async function init() {
   await loadAllData();
   setupEvents();
   setupSubcats();
-
   const savedCart = localStorage.getItem("cr7_cart");
   if (savedCart) cart = JSON.parse(savedCart);
   updateCartUI();
-
-  setMode(false);
+  document.getElementById("adminPanel")?.classList.remove("active");
+  if (document.getElementById("adminPanelContainer"))
+    document.getElementById("adminPanelContainer").style.display = "none";
+  document.getElementById("customerMain").style.display = "block";
 }
 
 init();

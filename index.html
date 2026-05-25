@@ -16,6 +16,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
   <body>
     <div class="toast-msg" id="toastMsg">✨ Added to cart</div>
@@ -135,30 +137,63 @@
         <div id="paymentSection" class="payment-section" style="display: none">
           <h3>💳 Select Payment Method</h3>
           <div class="payment-options">
-            <label class="payment-option"
-              ><input type="radio" name="paymentMethod" value="cod" checked />
-              💵 Cash on Delivery (COD)</label
-            >
-            <label class="payment-option"
-              ><input type="radio" name="paymentMethod" value="online" /> 🏦
-              Online Payment (Coming Soon)</label
-            >
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="card" checked />
+              💳 Credit/Debit Card
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="upi" />
+              📱 UPI (PhonePe, Google Pay, Amazon Pay)
+            </label>
           </div>
-          <div
-            id="onlinePaymentMsg"
-            class="online-payment-msg"
-            style="display: none"
-          >
-            ⚡ Online payment coming soon! Please select COD.
+          <div id="upiOptions" style="display: none; margin: 15px 0">
+            <label>Select UPI App:</label>
+            <select id="upiApp" class="auth-input">
+              <option value="phonepe">PhonePe</option>
+              <option value="gpay">Google Pay</option>
+              <option value="amazonpay">Amazon Pay</option>
+              <option value="supermoney">Super Money</option>
+            </select>
           </div>
-          <button class="back-to-delivery-btn" id="backToDeliveryBtn">
-            ← Back to Delivery
-          </button>
-          <button class="place-order-btn" id="placeOrderFinalBtn">
-            Place Order ✅
-          </button>
+          <button class="payment-btn" id="processPaymentBtn">Pay Now 💰</button>
         </div>
 
+        <!-- Payment Animations -->
+        <div
+          id="paymentSuccessAnim"
+          class="payment-animation success"
+          style="display: none"
+        >
+          <div class="payment-checkmark">✓</div>
+          <h3>✅ Payment Successful!</h3>
+          <p>
+            Your order has been confirmed. Money has been credited to our
+            account.
+          </p>
+        </div>
+
+        <div
+          id="paymentFailedAnim"
+          class="payment-animation failed"
+          style="display: none"
+        >
+          <div class="payment-cross">✗</div>
+          <h3>❌ Payment Failed!</h3>
+          <p>Your payment was not successful. Please try again.</p>
+        </div>
+
+        <div
+          id="paymentPendingAnim"
+          class="payment-animation pending"
+          style="display: none"
+        >
+          <div class="payment-clock">⏳</div>
+          <h3>⏰ Payment Pending</h3>
+          <p>
+            Your payment is being processed. You will receive confirmation
+            shortly.
+          </p>
+        </div>
         <div
           id="orderSuccessAnim"
           class="order-success-anim"

@@ -1,0 +1,43 @@
+.marquee-wrap {
+  overflow: hidden;
+  padding: 1.4rem 0;
+  background: #0d0d0d;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: marquee 18s linear infinite;
+  width: max-content;
+}
+
+.marquee-item {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 3.5px;
+  color: rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  transition: color 0.3s;
+}
+.marquee-item:hover {
+  color: rgba(255,122,0,0.5);
+}
+
+.marquee-dot {
+  width: 5px;
+  height: 5px;
+  background: #ff7a00;
+  border-radius: 50%;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

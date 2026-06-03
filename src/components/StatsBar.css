@@ -1,0 +1,32 @@
+.stats-bar {
+  padding: 3.5rem 3rem;
+  background: rgba(255,122,0,0.03);
+  border-top: 1px solid rgba(255,122,0,0.1);
+  border-bottom: 1px solid rgba(255,122,0,0.1);
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+}
+
+.stat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.2rem;
+  color: #ff7a00;
+  line-height: 1;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}

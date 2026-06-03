@@ -1,0 +1,124 @@
+.categories-section {
+  background: var(--dark);
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.cat-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1), border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,122,0,0.18) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.cat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255,122,0,0.4);
+  background: rgba(255,122,0,0.04);
+}
+.cat-card:hover .cat-card-glow { opacity: 1; }
+
+.cat-icon {
+  font-size: 2.6rem;
+  display: block;
+  margin-bottom: 1rem;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+  z-index: 1;
+}
+.cat-card:hover .cat-icon {
+  transform: scale(1.2) rotate(-6deg);
+}
+
+.cat-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 2.5px;
+  margin-bottom: 0.3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cat-count {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.cat-arrow {
+  font-size: 1.1rem;
+  color: #ff7a00;
+  margin-top: 0.8rem;
+  opacity: 0;
+  transform: translateX(-5px);
+  transition: opacity 0.3s, transform 0.3s;
+  position: relative;
+  z-index: 1;
+}
+.cat-card:hover .cat-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Active state for category buttons */
+.cat-card {
+  width: 100%;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  color: #faf8f5;
+  cursor: pointer;
+  text-align: center;
+}
+
+.cat-card.active {
+  border-color: #ff7a00 !important;
+  background: rgba(255,122,0,0.1) !important;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 0 0 1px rgba(255,122,0,0.4), 0 12px 40px rgba(255,122,0,0.2);
+}
+
+.cat-card.active .cat-card-glow { opacity: 1; }
+
+.cat-card.active .cat-name { color: #ff7a00; }
+
+.cat-card.active .cat-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #ff7a00;
+  font-weight: 700;
+}
+
+.cat-active-ring {
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #ff7a00;
+  border-radius: calc(var(--radius) + 2px);
+  animation: activeRing 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes activeRing {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.4; box-shadow: 0 0 12px rgba(255,122,0,0.4); }
+}

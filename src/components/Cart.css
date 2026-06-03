@@ -1,0 +1,192 @@
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1099;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.cart-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  max-width: 100vw;
+  height: 100vh;
+  background: #111;
+  border-left: 1px solid rgba(255,122,0,0.12);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.cart-drawer.open {
+  transform: translateX(0);
+}
+
+.cart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.8rem 1.5rem 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.cart-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  color: #fff;
+}
+
+.cart-count {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.cart-close {
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: rgba(255,255,255,0.6);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cart-close:hover { background: rgba(255,122,0,0.2); color: #ff7a00; }
+
+.cart-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+}
+.cart-body::-webkit-scrollbar { width: 3px; }
+.cart-body::-webkit-scrollbar-thumb { background: rgba(255,122,0,0.3); border-radius: 3px; }
+
+.cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0.8rem;
+  text-align: center;
+  padding: 3rem 0;
+}
+.cart-empty-icon { font-size: 3rem; opacity: 0.3; }
+.cart-empty p { color: rgba(255,255,255,0.35); font-size: 0.9rem; }
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  animation: slideIn 0.35s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.cart-item-img {
+  width: 60px;
+  height: 68px;
+  background: #1a1a1a;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.2rem; }
+.cart-item-cat { font-size: 0.7rem; color: rgba(255,255,255,0.28); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.4rem; }
+.cart-item-price { color: #ff7a00; font-weight: 700; font-size: 0.95rem; }
+
+.cart-item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.qty-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.qty-ctrl button {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  width: 30px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.qty-ctrl button:hover { background: rgba(255,122,0,0.2); color: #ff7a00; }
+.qty-ctrl span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-width: 22px;
+  text-align: center;
+}
+
+.cart-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.4;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.cart-remove:hover { opacity: 0.9; transform: scale(1.15); }
+
+.cart-footer {
+  padding: 1.2rem 1.5rem 1.8rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.cart-totals { margin-bottom: 1.2rem; }
+.cart-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+}
+.cart-row .free { color: #4caf7a; font-weight: 600; font-size: 0.78rem; }
+.cart-row.total { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem; margin-top: 0.4rem; font-size: 1rem; font-weight: 700; color: #fff; }
+
+.checkout-btn {
+  width: 100%;
+  justify-content: center;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
